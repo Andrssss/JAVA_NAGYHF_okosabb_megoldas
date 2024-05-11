@@ -71,11 +71,11 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
 
     @Override
     public void run() {
-        try {
+        /*try {
             this.wait(1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
+        }*/
         frame.repaint();
     }
 }

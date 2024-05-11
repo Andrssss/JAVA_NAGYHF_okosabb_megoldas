@@ -4,15 +4,19 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Allat {
-    /*protected Vectorr hely = new Vectorr();
+public class Allat implements Runnable {
+    protected Vectorr hely = new Vectorr();
     protected Color cubeColor;
-    boolean eletben_van;
-    int jatekosHely;
+    protected boolean eletben_van;
+    protected int jatekosHely;
+
+
     public void setJatekosHely(int ide){
         this.jatekosHely = ide;
     }
 
+    protected int XX = Field.getPalyameret_x();
+    protected int YY = Field.getPalyameret_y();
 
 
     public synchronized String randomMozgas(ArrayList<Falak> falak) {
@@ -52,8 +56,8 @@ public class Allat {
         if (ujX > 0  && ujX < Field.getPalyameret_x() && !x_fal_utkozes ) this.hely.x = ujX;
 
 
-
-
+        /// EZEK ITT JÓL MŰKÖDTEK  ----------------------------------------------------------------------
+  /*
         // Ne menjen ki a pályáról ------------------------
         if(!Palya_rajzol.getAtmehetJobbra(this.jatekosHely) && ujX >= Field.getPalyameret_x()-5 ) this.hely.x = Field.getPalyameret_x()-5;
         if(!Palya_rajzol.getAtmehetBalra(this.jatekosHely) && ujX <= 0) this.hely.x = 0;
@@ -68,9 +72,20 @@ public class Allat {
         if (ujX <= 0  && Palya_rajzol.getAtmehetBalra(jatekosHely) ) {
             this.hely.x = Field.getPalyameret_x()-5;
             return "balra";
-        }
+       }
+ */
         return "marad";
     }
+
+
+
+
+
+    @Override
+    public void run() {
+
+    }
+
 
 
 
@@ -79,15 +94,15 @@ public class Allat {
         cubeColor =  new Color(0,0,0);
     }
 
-    Farkas.Vectorr tavolsag(Farkas.Vectorr honnan) {
+    /*Vectorr tavolsag(Vectorr honnan) {
         if (honnan != null) {
-            return new Farkas.Vectorr(honnan.x - this.hely.x, honnan.y - this.hely.y);
+            return new Vectorr(honnan.x - this.hely.x, honnan.y - this.hely.y);
         } else {
             throw new IllegalArgumentException("honnan parameter cannot be null");
         }
     }
 
-    float tavolsag_floatban(Farkas.Vectorr honnan){
+    float tavolsag_floatban(Vectorr honnan){
         return (float) (honnan.x - this.hely.x + honnan.y - this.hely.y);
     }*/
 }

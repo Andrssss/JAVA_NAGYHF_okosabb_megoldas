@@ -1,35 +1,36 @@
 package org.example;
-
-import javax.swing.plaf.PanelUI;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
-
 import static java.lang.String.valueOf;
+public class Palya_kliens implements Runnable{ // Ő VAN JOBB OLDALT
+    protected boolean jobbra_atmehet = false;
+    protected boolean balra_atmehet  = true ;
 
-public class Palya_kliens implements Runnable{
-    public Palya_kliens(String host) throws IOException {
-        clientSocket = new Socket(host,PORT_NUMBER);
-    }
+
+
+
+
+
+
+
+
 
 
     protected Socket clientSocket;
     protected static int PORT_NUMBER = 19999;
     protected static String host;
+    protected boolean connected;
+
+
+    public Palya_kliens(String _host) throws IOException {
+        if(_host.isEmpty()) _host = "localhost";
+        this.host = _host;
+        connected = false;
+        System.out.println("2 - konstruktor lefut");
+    }
 
 
 
-
-
-
-
-
-
-
-    public void close() throws IOException {clientSocket.close();}
 
 
 
@@ -38,7 +39,7 @@ public class Palya_kliens implements Runnable{
 
     /// ------------------- GETTER / SETTER ----------------------------------------------------
     /// ----------------------------------------------------------------------------------------
-    public static String getHost() {return host;  }
+    public static String getHost() {return Palya_kliens.host;  }
     public static void setHost(String host) {Palya_kliens.host = host;  }
     public static String getPORT_NUMBER() { return valueOf(PORT_NUMBER);  }
     public static void setPORT_NUMBER(int newport) { PORT_NUMBER = newport;  }
@@ -48,38 +49,50 @@ public class Palya_kliens implements Runnable{
 
 
 
-
-
+    /// ---------------------------------   RUN      -------------------------------------------
+    /// ----------------------------------------------------------------------------------------
     public void run() {
         try {
-            WaitingFrame frame = new WaitingFrame(2);
-            //frame.setVisible(true);
+            //while (!connected) { // EZ SPAMEL, NEM FASZA
+            System.out.println("2 - csatlakozas elindul");
+                try {
+                    clientSocket = new Socket(host, PORT_NUMBER);
+                    connected = true;
+                    System.out.println("Connected to server: " + host);
+                    System.out.println("2 - success elkuldes");
+                    WaitingFrame.setMessege("success");
 
-            clientSocket.close();
+                    // Implement communication logic here (e.g., send/receive messages)
+                    // ...
+
+                } catch (IOException e) {
+                    System.err.println("Failed to connect to server: " + host);
+                    System.out.println("2 - fail elkuldes");
+                    WaitingFrame.setMessege("fail");
+                    /*try {
+                        Thread.sleep(5000); // Wait 5 seconds before retrying
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }*/
+                }
+            //}
+
+
+            //setMessege
+            if(clientSocket != null)  clientSocket.close();
         } catch (IOException e) {
             System.err.println("Failed to communicate with server!");
         }
     }
-
-
+    private void close() throws IOException {clientSocket.close();  connected = false;}
 
     /// ----------------------------------------------------------------------------------------
     /// ----------------------------------------------------------------------------------------
 
-
-
-
-    public static void main(String[] args) {
-        try {
-            // ezzál már lehet csatlakozni másik gépre, LAN-on woooooow
-            // new Thread(new JokeClient("192.168.249.31")).start();
-            new Thread(new Palya_kliens("localhost")).start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static void main(String[] args) throws IOException {
+        Palya_kliens p = new Palya_kliens("localhost");
+        new WaitingFrame(2);
     }
-
-
 }
 
 

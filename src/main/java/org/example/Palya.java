@@ -70,16 +70,13 @@ public class Palya implements Runnable{
                     // TODO
                     // EZ AKKOR NYILIK MEG, HA SIKERÜLT A CONNECTION
                     if(clientSocket == null)  {
-                        WaitingFrame frame = new WaitingFrame(1);
+                        //WaitingFrame frame = new WaitingFrame(1);
                     }
 
-                    System.out.println("1");
 
                     try {
-                        System.out.println("2");
                         clientSocket = serverSocket.accept(); // itt elfogadja a kérést és nyit egy socketet
                         new Palya_szerver(clientSocket).run();
-                        System.out.println("3");
 
                     } catch (java.net.SocketTimeoutException ste) {
                         // Itt fut le, ha timeout történik
@@ -92,7 +89,6 @@ public class Palya implements Runnable{
                 else{
                     System.out.println("SERVER       - Server socket is not empty");
                 }
-                System.out.println("4");
 
             }
         } catch (SocketException e) {

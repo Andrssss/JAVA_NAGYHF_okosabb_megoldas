@@ -22,20 +22,30 @@ public class ChangePortFrame extends JFrame implements ActionListener {
 
         button2.addActionListener(this);
         button3.addActionListener(this);
-
-
-        //JButton button1 = new JButton("add ip");
         //JButton button2 = new JButton("add port");
         //JButton button3 = new JButton("exit");
+
+
+
         if(playernumber == 2){
             button1.addActionListener(this);
+            //JButton button1 = new JButton("add ip");
             textField1.setPreferredSize(new Dimension(250,50));
-            textField1.setText("localhost");
+            textField1.setText(Palya_kliens.getHost());
+            System.out.println(Palya_kliens.getHost());
         }
 
 
         textField2.setPreferredSize(new Dimension(250,50));
-        textField2.setText(Palya.getPORT_NUMBER());
+
+        if(playernumber == 1){
+            textField2.setText(Palya.getPORT_NUMBER());
+        } else if(playernumber == 2){
+            textField2.setText(Palya_kliens.getPORT_NUMBER());
+
+
+        }
+
 
 
 
