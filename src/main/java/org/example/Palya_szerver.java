@@ -7,6 +7,7 @@ import java.net.Socket;
 public class Palya_szerver implements Runnable { // Ő LESZ BAL OLDALT
     protected boolean jobbra_atmehet = true;
     protected boolean balra_atmehet  = false;
+    public boolean ready_to_play  = false;
 
 
 

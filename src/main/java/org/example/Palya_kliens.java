@@ -60,10 +60,11 @@ public class Palya_kliens implements Runnable{ // Ő VAN JOBB OLDALT
                     connected = true;
                     System.out.println("Connected to server: " + host);
                     System.out.println("2 - success elkuldes");
-                    WaitingFrame.setMessege("success");
+                    //synchronized (WaitingFrame.messege){
+                        WaitingFrame.setMessege("success");
+                      //  notify();
+                    //}
 
-                    // Implement communication logic here (e.g., send/receive messages)
-                    // ...
 
                 } catch (IOException e) {
                     System.err.println("Failed to connect to server: " + host);

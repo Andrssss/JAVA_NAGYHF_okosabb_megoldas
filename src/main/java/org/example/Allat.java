@@ -5,18 +5,13 @@ import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Allat implements Runnable {
-    protected Vectorr hely = new Vectorr();
-    protected Color cubeColor;
-    protected boolean eletben_van;
-    protected int jatekosHely;
+    @Override
+    public void run() {
 
-
-    public void setJatekosHely(int ide){
-        this.jatekosHely = ide;
     }
 
-    protected int XX = Field.getPalyameret_x();
-    protected int YY = Field.getPalyameret_y();
+
+
 
 
     public synchronized String randomMozgas(ArrayList<Falak> falak) {
@@ -46,63 +41,54 @@ public class Allat implements Runnable {
         if (ujY < 0 )                                this.hely.y = 0;
 
 
-
-
-
-
-
-
-
+        // Új érték
         if (ujX > 0  && ujX < Field.getPalyameret_x() && !x_fal_utkozes ) this.hely.x = ujX;
 
-
-        /// EZEK ITT JÓL MŰKÖDTEK  ----------------------------------------------------------------------
-  /*
         // Ne menjen ki a pályáról ------------------------
-        if(!Palya_rajzol.getAtmehetJobbra(this.jatekosHely) && ujX >= Field.getPalyameret_x()-5 ) this.hely.x = Field.getPalyameret_x()-5;
-        if(!Palya_rajzol.getAtmehetBalra(this.jatekosHely) && ujX <= 0) this.hely.x = 0;
+        if(!jobbra_atmehet && ujX >= Field.getPalyameret_x()-5 ) this.hely.x = Field.getPalyameret_x()-5;
+        if(!balra_atmehet && ujX <= 0) this.hely.x = 0;
 
 
         // /JOBBRA, BALRA ÁTMEGY ---------------------------
-        if (ujX >= Field.getPalyameret_x() && Palya_rajzol.getAtmehetJobbra(jatekosHely)) {
-
+        if (ujX >= Field.getPalyameret_x() && jobbra_atmehet) {
             this.hely.x = 0;
             return "jobbra";
         }
-        if (ujX <= 0  && Palya_rajzol.getAtmehetBalra(jatekosHely) ) {
+        if (ujX <= 0  && balra_atmehet ) {
             this.hely.x = Field.getPalyameret_x()-5;
             return "balra";
-       }
- */
+        }
         return "marad";
     }
-
-
-
-
-
-    @Override
-    public void run() {
-
-    }
-
-
-
-
     void meghal(){
         eletben_van = false;
         cubeColor =  new Color(0,0,0);
     }
-
-    /*Vectorr tavolsag(Vectorr honnan) {
-        if (honnan != null) {
-            return new Vectorr(honnan.x - this.hely.x, honnan.y - this.hely.y);
-        } else {
-            throw new IllegalArgumentException("honnan parameter cannot be null");
+    public void setGazdi(int ide){
+        this.gazdi = ide;
+        setIranyok(ide);
+    }
+    public void setIranyok(int ide){
+        switch (ide){
+            case 1 :
+                jobbra_atmehet = true;
+                balra_atmehet = false;
+                break;
+            case 2 :
+                jobbra_atmehet = false;
+                balra_atmehet = true;
+                break;
         }
     }
 
-    float tavolsag_floatban(Vectorr honnan){
-        return (float) (honnan.x - this.hely.x + honnan.y - this.hely.y);
-    }*/
+
+
+    protected Vectorr hely = new Vectorr();
+    protected Color cubeColor;
+    protected boolean eletben_van;
+    protected int XX = Field.getPalyameret_x();
+    protected int YY = Field.getPalyameret_y();
+    protected int gazdi;
+    protected boolean jobbra_atmehet;
+    protected boolean balra_atmehet;
 }
