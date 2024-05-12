@@ -25,41 +25,49 @@ public class Field_Panel extends JPanel implements ActionListener {
     }
 
     public void paint(Graphics g){
-        System.out.println("repaint");
+        //System.out.println("repaint");
         super.paint(g);
         Graphics g2d = (Graphics2D) g;
         g2d.setColor(palya_szine);
         g2d.fillRect(0, 0, 500, 500);
 
 
+        //drawObjects(g2d,baranyok);
+        //drawObjects(g2d,farkasok);
+        //drawObjects(g2d,falak);
+        // --------------------- BARANYOK ------------------------------------
         if(!baranyok.isEmpty()) g2d.setColor(baranyok.get(0).cubeColor);
         for (Barany b : baranyok) {
-            // Csak a saját bárányait rajzolja ki
-            //if (b.jatekosHely == jatekosSzam) {
                 g2d.fillRect((int) b.hely.x, (int) b.hely.y, 5, 5);
-            //}
         }
+        // --------------------- FARKASOK  ------------------------------------
         if(!farkasok.isEmpty()) g2d.setColor(farkasok.get(0).cubeColor);
         for (Farkas b : farkasok) {
-            // Csak a saját bárányait rajzolja ki
-            //if (b.jatekosHely == jatekosSzam) {
                 g2d.fillRect((int) b.hely.x, (int) b.hely.y, 5, 5);
-            //}
         }
+        // --------------------- FALAK ------------------------------------
         if(!falak.isEmpty())  g2d.setColor(falak.get(0).cubeColor);
         for(Falak f : falak){
-            //if(f.jatekosHely == jatekosSzam){
                 g2d.fillRect((int) f.hely.x, (int) f.hely.y, 5, 5);
-            //}
         }
     }
+
+    /*private void drawObjects(Graphics2D g2d, List<? extends Allat> objects) {
+        if (!objects.isEmpty()) {
+            g2d.setColor(objects.get(0).getCubeColor()); // Set color based on first object
+            for (Rajzolhato object : objects) {
+                g2d.fillRect((int) object.getHely().x, (int) object.getHely().y, 5, 5);
+            }
+        }
+    }*/
+
 
     @Override
     public void actionPerformed(ActionEvent e) { // ez fog másodpercenként
         myfield.AllatokMozog();
 
         // ITT KELL A MOZGAST MEGVALOSITANI - VAGY NEM TUDOM
-        System.out.println("get animals");
+        //System.out.println("get animals");
         // ennek esetleg egetne külön klass
         this.baranyok = myfield.getBaranyok();
         this.farkasok = myfield.getFarkasok();

@@ -6,14 +6,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ChangePortFrame extends JFrame implements ActionListener {
-    JFrame frame = new JFrame();
-    JLabel label = new JLabel("hello");
-    JButton button3 = new JButton("exit");
-    JButton button1 = new JButton("add ip");
-    JButton button2 = new JButton("add port");
-    JTextField textField1 = new JTextField();
-    JTextField textField2 = new JTextField();
+    private final JFrame frame = new JFrame();
+    private final JLabel label = new JLabel("hello");
+    private final JButton button3 = new JButton("exit");
+    private final JButton button1 = new JButton("add ip");
+    private final JButton button2 = new JButton("add port");
+    private final JTextField textField1 = new JTextField();
+    private final JTextField textField2 = new JTextField();
     protected int  playernumber;
+
+
     ChangePortFrame(int _playernumber){
         playernumber = _playernumber;
         label.setBounds(0,0,100,50);
@@ -22,14 +24,12 @@ public class ChangePortFrame extends JFrame implements ActionListener {
 
         button2.addActionListener(this);
         button3.addActionListener(this);
-        //JButton button2 = new JButton("add port");
-        //JButton button3 = new JButton("exit");
+
 
 
 
         if(playernumber == 2){
             button1.addActionListener(this);
-            //JButton button1 = new JButton("add ip");
             textField1.setPreferredSize(new Dimension(250,50));
             textField1.setText(Palya_kliens.getHost());
             System.out.println(Palya_kliens.getHost());
@@ -86,7 +86,7 @@ public class ChangePortFrame extends JFrame implements ActionListener {
 
 
             if(isInteger(input_data).equals(" ")){
-                textField2.setText(String.valueOf("Ez nem valid port"));
+                textField2.setText("Ez nem valid port");
             }
             else{
                 int number = Integer.parseInt(input_data);

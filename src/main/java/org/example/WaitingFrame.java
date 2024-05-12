@@ -74,11 +74,8 @@ public class WaitingFrame extends JFrame implements ActionListener {
                     }
                     break;
                 case 2:
-                    try {
-                        KLIENS_PROBAL_CSATLAKOZNI();
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
+                    KLIENS_PROBAL_CSATLAKOZNI();
+
                     break;
 
                 default:
@@ -94,48 +91,23 @@ public class WaitingFrame extends JFrame implements ActionListener {
 
 
 
-    private void KLIENS_PROBAL_CSATLAKOZNI() throws InterruptedException {
-        //kliens_probalcsatlakozni k1 = new kliens_probalcsatlakozni(playernumber,messege,f1,this);
+    private void KLIENS_PROBAL_CSATLAKOZNI() {
+        Field f2 = new Field(2,true);
+        Palya_kliens kliens = new Palya_kliens("localhost",f2);
 
-
-
-        System.out.println(playernumber + " - csatlakozik");
-        try {
-            new Thread(new Palya_kliens("localhost")).start();
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
+        if(messege.equals("success")){
+            // HA EZT ITT NEM TESZED MEG, AKKOR 1 SZÁLUNK FUT EZ MEG A KLIENS MEG A FIELD XDDD
+            // JAVA EZ MI A FASZOM, LEHET ÉN VAGYOK A BUTA DE FÉL KURVA NAPOM ELMENT EZZEL
+            new Thread(new Palya_kliens("localhost",f1)).start();
+            f2.run();
+            frame.dispose();
+        }else{
+            reconnect();
         }
-        // EZ A SZÜKSÉGES ROSSZ, ENÉLKÜL ELŐBB OLVASNÁ EZ A SZÁL A VÁLASZT, MINTHOGY MEGPROBÁLT VOLNA CSATLAKOZNI
-        // KÖSZÖNÖM JAVA A 2 ÓRÁS SZENVEDÉST, UTOLSÓ 2 HÉTBEN ERRE HOGY NE LENNE IDŐ
-        // todo
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        //synchronized (messege){
-        //    wait();
-            System.out.println(playernumber + " - uzenetet olvas");
-
-            if(messege.equals("success")){
-                Field f2 = new Field(playernumber,true);
-                f2.run();
-                if(f1 != null )  f1.setReadyToRockAndRoll(true); // EZ A FASZÉ NEM MŰKÖDIK
-                else System.out.println("f1 is empty");
-                frame.dispose();
-
-
-                // ide ér, de a másik ablakot nem csukja be
-                // todo
-            }else{
-                button1.setText("Reconnect");
-                label2.setText("Erros cant connect");
-            }
-        //}
     }
 
-
     public void reconnect(){
+        System.err.println("Nem sikerult csatlakozni a szerverhez.");
         button1.setText("Reconnect");
         label2.setText("Erros cant connect");
     }
@@ -145,40 +117,36 @@ public class WaitingFrame extends JFrame implements ActionListener {
 
 
     private void SZERVER_INDUL() throws InterruptedException {
-        if(messege.equals("success")){
+        /*if(messege.equals("success")){
             System.out.println("XXXX");
             f1 = new Field(1,true);
             f1.run();
             frame.dispose();
-        }
+        }*/
         // WAITING -------------------------
-        else{
-            //frame.getContentPane().removeAll();
-            button1.setVisible(false);
-            button2.setVisible(false);
-            label2.setVisible(false);
-            label1.setText("Waiting for Player2");
-            new Thread(new Palya()).start();
-
-
+        //else{
+            //button1.setVisible(false);
+            //button2.setVisible(false);
+            //label2.setVisible(false);
+            //label1.setText("Waiting for Player2");
+            f1 = new Field(1,true);
+            new Thread(new Palya(f1)).start();
 
 
             // Az istenért nem akar működni
             // todo
             // todo
             //this.f1 = new Field(1,false); ---> ez az eredeti
-            this.f1 = new Field(1,true);
-            this.f1.run();
+            f1.run();
             frame.dispose();
             // todo
             // todo
-             /// -----------------------------------------------------
-             /// ------------ide kell vmi ami figyeli    -------------
-             /// ------------hogy csatlakozott-e a masik -------------
-             /// -----------------------------------------------------
-        }
+            /// -----------------------------------------------------
+            /// ------------ide kell vmi ami figyeli    -------------
+            /// ------------hogy csatlakozott-e a masik -------------
+            /// -----------------------------------------------------
+        //}
     }
 
 
 }
-

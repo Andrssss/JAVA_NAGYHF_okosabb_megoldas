@@ -66,9 +66,6 @@ public class Allat implements Runnable {
     }
     public void setGazdi(int ide){
         this.gazdi = ide;
-        setIranyok(ide);
-    }
-    public void setIranyok(int ide){
         switch (ide){
             case 1 :
                 jobbra_atmehet = true;
@@ -91,4 +88,5 @@ public class Allat implements Runnable {
     protected int gazdi;
     protected boolean jobbra_atmehet;
     protected boolean balra_atmehet;
+
 }
