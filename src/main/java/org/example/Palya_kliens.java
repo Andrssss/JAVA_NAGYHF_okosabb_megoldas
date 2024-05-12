@@ -10,12 +10,6 @@ public class Palya_kliens implements Runnable{ // Ő VAN JOBB OLDALT
 
 
 
-
-
-
-
-
-
     protected Socket clientSocket;
     protected static int PORT_NUMBER = 19999;
     protected static String host;
@@ -70,11 +64,6 @@ public class Palya_kliens implements Runnable{ // Ő VAN JOBB OLDALT
                     System.err.println("Failed to connect to server: " + host);
                     System.out.println("2 - fail elkuldes");
                     WaitingFrame.setMessege("fail");
-                    /*try {
-                        Thread.sleep(5000); // Wait 5 seconds before retrying
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }*/
                 }
             //}
 

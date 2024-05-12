@@ -56,6 +56,7 @@ public class Field_Panel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) { // ez fog másodpercenként
+        myfield.AllatokMozog();
 
         // ITT KELL A MOZGAST MEGVALOSITANI - VAGY NEM TUDOM
         System.out.println("get animals");
@@ -63,6 +64,7 @@ public class Field_Panel extends JPanel implements ActionListener {
         this.baranyok = myfield.getBaranyok();
         this.farkasok = myfield.getFarkasok();
         this.falak    = myfield.getFalak();
+
 
 
         repaint();
