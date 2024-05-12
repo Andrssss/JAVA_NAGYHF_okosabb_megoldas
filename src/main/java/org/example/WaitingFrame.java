@@ -120,7 +120,7 @@ public class WaitingFrame extends JFrame implements ActionListener {
             if(messege.equals("success")){
                 Field f2 = new Field(playernumber,true);
                 f2.run();
-                if(f1 != null )  f1.setReadyToRockAndRoll(true);
+                if(f1 != null )  f1.setReadyToRockAndRoll(true); // EZ A FASZÉ NEM MŰKÖDIK
                 else System.out.println("f1 is empty");
                 frame.dispose();
 
