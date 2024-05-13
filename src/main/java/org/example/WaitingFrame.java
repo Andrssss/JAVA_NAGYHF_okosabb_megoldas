@@ -95,12 +95,13 @@ public class WaitingFrame extends JFrame implements ActionListener {
 
     private void KLIENS_PROBAL_CSATLAKOZNI() {
         Field f2 = new Field(2,true);
-        Palya_kliens kliens = new Palya_kliens("localhost",f2);
-
+        //Palya_kliens kliens = new Palya_kliens("localhost",f2);
+        Thread t1 = new Thread(new Palya_kliens("localhost",f2));
         if(messege.equals("success")){
             // HA EZT ITT NEM TESZED MEG, AKKOR 1 SZÁLUNK FUT EZ MEG A KLIENS MEG A FIELD XDDD
             // JAVA EZ MI A FASZOM, LEHET ÉN VAGYOK A BUTA DE FÉL KURVA NAPOM ELMENT EZZEL
-            new Thread(new Palya_kliens("localhost",f1)).start();
+            t1.start();
+            // new Thread(new Palya_kliens("localhost",f2)).start();
             f2.run();
             frame.dispose();
         }else{

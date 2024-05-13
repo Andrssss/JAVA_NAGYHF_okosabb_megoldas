@@ -11,15 +11,22 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
     Palya_szerver palya_szerver;
 
 
-    public void addBarany(Barany b,int number){
-        System.out.println("Barany - y : " + number+ " Player" + playernumber);
+    public void addBarany(int number){
+        //System.out.println("Barany - y : " + number+ " Player" + playernumber);
+        // todo ---------
+        // todo --------- Az nem 0, hanem attól függ, hogy merre lett küldve
+        Barany b = new Barany(0,number);
+        // todo ---------
+        // todo ---------
+        b.setGazdi(playernumber);
         b_list.add(b);
-        // todo
         b.run();
     }
 
-    public void addFarkas(Farkas f,int number){
+    public void addFarkas(int number){
         System.out.println("Farkas - y : " + number + " Player" + playernumber);
+        Farkas f = new Farkas(0, number);
+        f.setGazdi(playernumber);
         f_list.add(f);
         f.run();
     }
@@ -37,7 +44,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
             if(!eredmeny.equals("sima")) {
                 if (eredmeny.equals("jobbra")) {
                     if (b.jobbra_atmehet && b.gazdi == 1 && READY_TO_SAND) {
-                        System.out.println("barany kuldes jobbra");
+                        //System.out.println("barany kuldes jobbra");
                         int y_hely =(int) b.hely.y;
                         b.stopRunning();
 
@@ -54,7 +61,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                     }
                 } else if (eredmeny.equals("balra")) {
                     if (b.balra_atmehet && b.gazdi == 2 && READY_TO_SAND) {
-                        System.out.println("barany kuldes balra");
+                        //System.out.println("barany kuldes balra");
                         //b.gazdi = 1;
                         //palya_kliens.sendObjects(b);
                         int y_hely =(int) b.hely.y;
@@ -78,7 +85,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
             if(!eredmeny.equals("sima")) {
                 if (eredmeny.equals("jobbra")) {
                     if (b.jobbra_atmehet && b.gazdi == 1 && READY_TO_SAND) {
-                        System.out.println("farkas kuldes jobbra");
+                        //System.out.println("farkas kuldes jobbra");
                         //b.gazdi = 2;
                         int y_hely =(int) b.hely.y;
                         b.stopRunning();
@@ -94,7 +101,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                     }
                 } else if (eredmeny.equals("balra")) {
                     if (b.balra_atmehet && b.gazdi == 2 && READY_TO_SAND) {
-                        System.out.println("farkas kuldes balra");
+                        //System.out.println("farkas kuldes balra");
                         //b.gazdi = 1;
                         //palya_kliens.sendObjects(b);
                         int y_hely =(int) b.hely.y;

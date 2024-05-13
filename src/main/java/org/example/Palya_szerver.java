@@ -60,15 +60,11 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
                         // EZ MÉG CSAK JOBBRA MŰKÖDIK
                         if(kapott_allat.substring(0,6).equals("Barany")){
                             int number = convert_StringMessege_to_int(kapott_allat);
-                            Barany b = new Barany(0,number);
-                            b.setGazdi(1);
-                            myField.addBarany(b,number);
+                            myField.addBarany(number);
                         }
-                        else if(kapott_allat.equals("Farkas")){
+                        else if(kapott_allat.substring(0,6).equals("Farkas")){
                             int number = convert_StringMessege_to_int(kapott_allat);
-                            Farkas b = new Farkas(0,number);
-                            b.setGazdi(1);
-                            myField.addFarkas(b,number);
+                            myField.addFarkas(number);
                         }else {
                             System.out.println("Palya_szerver kapott uzenet : " + kapott_allat);
                         }
