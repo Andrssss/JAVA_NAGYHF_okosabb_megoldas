@@ -4,29 +4,19 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 
 public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OLDALT
-    protected Socket clientSocket;
+    protected static Socket clientSocket;
+    private static int PORT_NUMBER= 19999;
     protected BufferedReader clientReader;
     protected static PrintWriter clientWriter;
     Field myField;
-
-    private static String send_messege;
-    public static synchronized void send_animal(String send_this){
-        send_messege = send_this;
-
-        // todo
-        // todo
-        // todo
-        // maga a kuldest
-    }
-
     //private ObjectInputStream inputStream;
     //private ObjectOutputStream outputStream;
 
-    Palya_szerver(Socket clientSocket, Field f1) throws IOException {
+    Palya_szerver(Socket _clientSocket, Field f1) throws IOException {
         myField = f1;
-        this.clientSocket = clientSocket;
+        this.clientSocket = _clientSocket;
         this.clientReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        this.clientWriter = new PrintWriter(clientSocket.getOutputStream()); //
+        clientWriter = new PrintWriter(clientSocket.getOutputStream()); //
         //this.outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
         //this.inputStream = new ObjectInputStream(clientSocket.getInputStream());
     }
@@ -48,14 +38,22 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
     /// ----------------------------------------------------------------------------------------
     public void run() {
         try {
-            BufferedReader serverInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            //BufferedReader serverInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
             if(clientSocket.isConnected()) {
                 System.out.println("PLAYER1       - KAPCSOLAT ELINDULT A : " + clientSocket.getPort() + " -AL");
 
                 while(true){
-                    String kapott_allat = serverInput.readLine();
-                    if (kapott_allat == null || kapott_allat.isEmpty()){System.out.println("Uzenet ures");
-                    Thread.sleep(1000);}
+                    String kapott_allat = clientReader.readLine();
+
+                    if (kapott_allat == null || kapott_allat.isEmpty()){
+                        //System.out.println("Szerver : Uzenet ures");
+                        //Thread.sleep(1000);
+                    }
+                    else if (kapott_allat.equals("game_over")) {
+                        clientSocket.close();
+                        return;
+                    }
                     else{
                         // TODO -----------------------------------------------------------------------
                         // TODO -----------------------------------------------------------------------
@@ -64,13 +62,13 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
                             int number = convert_StringMessege_to_int(kapott_allat);
                             Barany b = new Barany(0,number);
                             b.setGazdi(1);
-                            myField.addBarany(b);
+                            myField.addBarany(b,number);
                         }
                         else if(kapott_allat.equals("Farkas")){
                             int number = convert_StringMessege_to_int(kapott_allat);
                             Farkas b = new Farkas(0,number);
                             b.setGazdi(1);
-                            myField.addFarkas(b);
+                            myField.addFarkas(b,number);
                         }else {
                             System.out.println("Palya_szerver kapott uzenet : " + kapott_allat);
                         }
@@ -91,6 +89,8 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
                 //Thread senderThread = new Thread(this::sendObjects);
                 //senderThread.start();
                 //senderThread.join();
+
+
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -109,8 +109,12 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
 
     protected static void sendLine(String line) throws IOException {
         // NULLPOINTER ERROR
-        clientWriter.print(line + "\r\n");
-        clientWriter.flush();
+        if(clientSocket!=null){
+            System.out.println("Szerver send : "+ line + " to : " +clientSocket.getInetAddress()+":"+ PORT_NUMBER+" - "+ clientSocket.getPort());
+            clientWriter.print(line + "\r\n");
+            clientWriter.flush();
+        }
+
     }
     private int convert_StringMessege_to_int(String kapott_allat){
         String remainingText = kapott_allat.substring(9);

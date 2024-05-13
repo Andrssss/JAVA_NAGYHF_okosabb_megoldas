@@ -52,6 +52,8 @@ public class WaitingFrame extends JFrame implements ActionListener {
         frame.add(label1);
         frame.add(label2);
         frame.add(button2);
+        if(playernumber ==1) frame.setLocation(100, 100);
+        if(playernumber ==2) frame.setLocation(700, 100);
         frame.setTitle("PLAYER -  " + playernumber);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

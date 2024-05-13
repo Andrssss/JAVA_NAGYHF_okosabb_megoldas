@@ -4,11 +4,21 @@ import java.awt.*;
 public class Farkas extends Allat implements Runnable {
 
 
-
+    boolean running = true;
+    public void stopRunning() {
+        this.running = false; // Set the running flag to false to stop the thread
+    }
 
     @Override
     public void run() {
         System.out.println("Farkas fut");
+        while (running) {
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 

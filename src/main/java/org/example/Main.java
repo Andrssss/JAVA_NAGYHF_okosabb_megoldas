@@ -5,12 +5,21 @@ public class Main {
 
         new WaitingFrame(1);
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+
 
         new WaitingFrame(2);
+
+
+        /*while(true){
+            int activeThreads = Thread.activeCount();
+            System.out.println("Jelenleg futó szálak száma: " + activeThreads);
+            // main
+            // server socket
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }*/
     }
 }

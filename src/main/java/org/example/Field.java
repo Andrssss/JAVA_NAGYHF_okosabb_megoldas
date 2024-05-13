@@ -11,23 +11,24 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
     Palya_szerver palya_szerver;
 
 
-    public void addBarany(Barany b){
+    public void addBarany(Barany b,int number){
+        System.out.println("Barany - y : " + number+ " Player" + playernumber);
         b_list.add(b);
+        // todo
         b.run();
     }
 
-    public void addFarkas(Farkas f){
+    public void addFarkas(Farkas f,int number){
+        System.out.println("Farkas - y : " + number + " Player" + playernumber);
         f_list.add(f);
         f.run();
     }
 
-    /*
-A hibaüzenet, amit kaptál, a "java.util.ConcurrentModificationException" kivételt jelzi.
-Ez a hiba akkor fordul elő, amikor egy ArrayList-t (vagy bármilyen más olyan kollekciót,
- ami a List interface-t implementálja) próbálsz módosítani miközben egy Iterator segítségével bejáródsz rajta.
-     */
-    // todo megoldás lehet sima for ciklus ehelyett
+
     public void AllatokMozog(){
+        ArrayList<Barany> remove_b_list =  new ArrayList<>();
+        ArrayList<Farkas> remove_f_list =  new ArrayList<>();
+
         for (Barany b : b_list) {
             String eredmeny = b.randomMozgas(fal_list);
             //System.out.println( " String : " +eredmeny);
@@ -37,30 +38,34 @@ Ez a hiba akkor fordul elő, amikor egy ArrayList-t (vagy bármilyen más olyan 
                 if (eredmeny.equals("jobbra")) {
                     if (b.jobbra_atmehet && b.gazdi == 1 && READY_TO_SAND) {
                         System.out.println("barany kuldes jobbra");
-                        b.gazdi = 2;
-                        //palya_szerver.sendObjects(b);
+                        int y_hely =(int) b.hely.y;
+                        b.stopRunning();
+
                         try {
-                            Palya_szerver.sendLine("Barany - "+ b.hely.y);
+                            Palya_szerver.sendLine("Barany - "+ y_hely);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
-                        b_list.remove(b);
-
+                        // todo itt meg kell állítani a szálat
+                        //b_list.remove(b);
+                        remove_b_list.add(b);
                     } else {
                         //System.out.println("Barany felrement valami");
                     }
                 } else if (eredmeny.equals("balra")) {
                     if (b.balra_atmehet && b.gazdi == 2 && READY_TO_SAND) {
                         System.out.println("barany kuldes balra");
-                        b.gazdi = 1;
+                        //b.gazdi = 1;
                         //palya_kliens.sendObjects(b);
+                        int y_hely =(int) b.hely.y;
+                        b.stopRunning();
                         try {
-                            Palya_kliens.sendLine("Barany - "+ b.hely.y);
+                            Palya_kliens.sendLine("Barany - "+ y_hely);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
-                        b_list.remove(b);
-                        // todo
+                        remove_b_list.add(b);
+                        //b_list.remove(b);
                     } else {
                         //System.out.println("Valami felrement");
                     }
@@ -74,37 +79,49 @@ Ez a hiba akkor fordul elő, amikor egy ArrayList-t (vagy bármilyen más olyan 
                 if (eredmeny.equals("jobbra")) {
                     if (b.jobbra_atmehet && b.gazdi == 1 && READY_TO_SAND) {
                         System.out.println("farkas kuldes jobbra");
-                        b.gazdi = 2;
+                        //b.gazdi = 2;
+                        int y_hely =(int) b.hely.y;
+                        b.stopRunning();
                         try {
-                            Palya_szerver.sendLine("Farkas - "+ b.hely.y);
+                            Palya_szerver.sendLine("Farkas - "+ y_hely);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
-                        b_list.remove(b);
-                        // todo
-
+                        remove_f_list.add(b);
+                        //f_list.remove(b);
                     } else {
                         //System.out.println("Valami felrement");
                     }
                 } else if (eredmeny.equals("balra")) {
                     if (b.balra_atmehet && b.gazdi == 2 && READY_TO_SAND) {
                         System.out.println("farkas kuldes balra");
-                        b.gazdi = 1;
+                        //b.gazdi = 1;
                         //palya_kliens.sendObjects(b);
+                        int y_hely =(int) b.hely.y;
+                        b.stopRunning();
                         try {
-                            Palya_kliens.sendLine("Farkas - "+ b.hely.y);
+                            Palya_kliens.sendLine("Farkas - "+ y_hely);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
-                        b_list.remove(b);
-                        // todo
-
+                        remove_f_list.add(b);
+                        //f_list.remove(b);
                     } else {
                         //System.out.println("Valami felrement");
                     }
                 }
             }
         }
+
+
+        // itt törölni az elemeket
+        for(Barany b : remove_b_list){
+            b_list.remove(b);
+        }
+        for(Farkas b : remove_f_list){
+            f_list.remove(b);
+        }
+
     }
 
 
@@ -148,9 +165,10 @@ Ez a hiba akkor fordul elő, amikor egy ArrayList-t (vagy bármilyen más olyan 
         //frame.add(label1);
         frame.add(panel);
         frame.addMouseListener(this);
+        if(playernumber ==1) frame.setLocation(100, 100);
+        if(playernumber ==2) frame.setLocation(700, 100);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
-        frame.setLocationRelativeTo(null);
         frame.setLayout(null);
 
     }
@@ -191,22 +209,23 @@ Ez a hiba akkor fordul elő, amikor egy ArrayList-t (vagy bármilyen más olyan 
             int baranyok_szama = 3;
 
             for (int i = 0; i < baranyok_szama; i++) {
-                Barany b = new Barany();
-                b.setGazdi(playernumber);
-                b_list.add(b);
+                Barany barany = new Barany();
+                barany.setGazdi(playernumber);
+                b_list.add(barany); // Add Baranyok object to the list
+
+                Thread thread = new Thread(barany);
+                thread.setName("Barany" + (i + 1)); // Set unique thread names
+                thread.start();
+
             }
             for (int i = 0; i < farkaso_szama; i++) {
                 Farkas f = new Farkas();
                 f.setGazdi(playernumber);
-                f_list.add(f);
-            }
+                f_list.add(f); // Add Baranyok object to the list
 
-
-            for (int i = 0; i < baranyok_szama; i++) {
-                b_list.get(i).run();
-            }
-            for (int i = 0; i < farkaso_szama; i++) {
-                f_list.get(i).run();
+                Thread thread = new Thread(f);
+                thread.setName("Farkas" + (i + 1)); // Set unique thread names
+                thread.start();
             }
         }
     }

@@ -3,18 +3,28 @@ import java.awt.*;
 
 
 public class Barany extends Allat implements Runnable{
+    boolean running = true;
 
     @Override
     public void run() {
         System.out.println("Barany fut");
-        //while(true){
-            //System.out.println("Barany fut");
-        //}
+        while (running) {
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+
+
         //randomMozgas();
     }
 
 
-
+    public void stopRunning() {
+        this.running = false; // Set the running flag to false to stop the thread
+    }
 
 
 
