@@ -21,14 +21,11 @@ public class ChangePortFrame extends JFrame implements ActionListener {
         label.setBounds(0,0,100,50);
         label.setFont(new Font(null,Font.PLAIN,25));
 
-
         button2.addActionListener(this);
         button3.addActionListener(this);
 
-
-
-
-        if(playernumber == 2){
+        // HA nem a szerver
+        if(playernumber != 1){
             button1.addActionListener(this);
             textField1.setPreferredSize(new Dimension(250,50));
             textField1.setText(Palya_kliens.getHost());
@@ -42,8 +39,6 @@ public class ChangePortFrame extends JFrame implements ActionListener {
             textField2.setText(Palya.getPORT_NUMBER());
         } else if(playernumber == 2){
             textField2.setText(Palya_kliens.getPORT_NUMBER());
-
-
         }
 
 
@@ -56,10 +51,10 @@ public class ChangePortFrame extends JFrame implements ActionListener {
 
         frame.setLayout(new FlowLayout());
 
-        if(playernumber == 2)  frame.add(button1);
+        if(playernumber != 1)  frame.add(button1);
         frame.add(button2);
         frame.add(button3);
-        if(playernumber == 2)   frame.add(textField1);
+        if(playernumber != 1)   frame.add(textField1);
         frame.add(textField2);
 
 

@@ -108,6 +108,7 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
 
 
     protected static void sendLine(String line) throws IOException {
+        // NULLPOINTER ERROR
         clientWriter.print(line + "\r\n");
         clientWriter.flush();
     }

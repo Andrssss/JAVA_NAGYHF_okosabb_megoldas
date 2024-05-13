@@ -21,6 +21,12 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
         f.run();
     }
 
+    /*
+A hibaüzenet, amit kaptál, a "java.util.ConcurrentModificationException" kivételt jelzi.
+Ez a hiba akkor fordul elő, amikor egy ArrayList-t (vagy bármilyen más olyan kollekciót,
+ ami a List interface-t implementálja) próbálsz módosítani miközben egy Iterator segítségével bejáródsz rajta.
+     */
+    // todo megoldás lehet sima for ciklus ehelyett
     public void AllatokMozog(){
         for (Barany b : b_list) {
             String eredmeny = b.randomMozgas(fal_list);
@@ -30,7 +36,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
             if(!eredmeny.equals("sima")) {
                 if (eredmeny.equals("jobbra")) {
                     if (b.jobbra_atmehet && b.gazdi == 1 && READY_TO_SAND) {
-                        System.out.println("barany kuldes");
+                        System.out.println("barany kuldes jobbra");
                         b.gazdi = 2;
                         //palya_szerver.sendObjects(b);
                         try {
@@ -45,6 +51,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                     }
                 } else if (eredmeny.equals("balra")) {
                     if (b.balra_atmehet && b.gazdi == 2 && READY_TO_SAND) {
+                        System.out.println("barany kuldes balra");
                         b.gazdi = 1;
                         //palya_kliens.sendObjects(b);
                         try {
@@ -66,6 +73,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
             if(!eredmeny.equals("sima")) {
                 if (eredmeny.equals("jobbra")) {
                     if (b.jobbra_atmehet && b.gazdi == 1 && READY_TO_SAND) {
+                        System.out.println("farkas kuldes jobbra");
                         b.gazdi = 2;
                         try {
                             Palya_szerver.sendLine("Farkas - "+ b.hely.y);
@@ -80,6 +88,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                     }
                 } else if (eredmeny.equals("balra")) {
                     if (b.balra_atmehet && b.gazdi == 2 && READY_TO_SAND) {
+                        System.out.println("farkas kuldes balra");
                         b.gazdi = 1;
                         //palya_kliens.sendObjects(b);
                         try {
