@@ -14,6 +14,7 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
 
     Palya_szerver(Socket _clientSocket, Field f1) throws IOException {
         myField = f1;
+        new Thread(myField).start();
         this.clientSocket = _clientSocket;
         this.clientReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         clientWriter = new PrintWriter(clientSocket.getOutputStream()); //
@@ -41,6 +42,8 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
             //BufferedReader serverInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
             if(clientSocket.isConnected()) {
+                if(Myw1!= null)Myw1.kapcsolat_indul();
+
                 System.out.println("PLAYER1       - KAPCSOLAT ELINDULT A : " + clientSocket.getPort() + " -AL");
 
                 while(true){
@@ -109,9 +112,16 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
             System.out.println("Szerver send : "+ line + " to : " +clientSocket.getInetAddress()+":"+ PORT_NUMBER+" - "+ clientSocket.getPort());
             clientWriter.print(line + "\r\n");
             clientWriter.flush();
+        }else{
+            System.err.println("Server : Clientsocket is null");
         }
-
     }
+
+    private static int baranyaim = 0;
+    protected static void ennyi_baranyod_van(int ennyi_baranyom_van){
+        baranyaim = ennyi_baranyom_van;
+    }
+
     private int convert_StringMessege_to_int(String kapott_allat){
         String remainingText = kapott_allat.substring(9);
         System.out.println(remainingText);
@@ -129,9 +139,10 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
         }
         return number;
     }
-
+    private static WaitingFrame Myw1;
     public static void main(String[] args) {
-        new WaitingFrame(1);
+        WaitingFrame w1 = new WaitingFrame(1);
+        Myw1 = w1;
     }
 }
 

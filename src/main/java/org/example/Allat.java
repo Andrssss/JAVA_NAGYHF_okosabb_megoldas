@@ -4,7 +4,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Allat implements Runnable {
+public abstract class Allat implements Runnable {
     @Override
     public void run() {
 
@@ -16,7 +16,7 @@ public class Allat implements Runnable {
 
     public synchronized String randomMozgas(ArrayList<Falak> falak) {
         // Generálunk véletlenszerű irányokat
-        int irany_x =6;
+        int irany_x =5;
         int irany_y = ThreadLocalRandom.current().nextInt(-1, 2); // -1, 0, vagy 1 lehet az irány
 
         // Beállítjuk az új pozíciót a véletlenszerű irányok alapján
@@ -28,8 +28,8 @@ public class Allat implements Runnable {
         boolean x_fal_utkozes = false;
         boolean y_fal_utkozes = false;
         for(Falak f : falak){
-            if(ujX > f.hely.x-5 && Math.abs(ujY - f.hely.y-5)<5) x_fal_utkozes = true;
-            if(ujY > f.hely.y-5 && Math.abs(ujY - f.hely.y-5)<5) y_fal_utkozes = true;
+            if(ujX >= f.hely.x-5 && (Math.abs(ujY - f.hely.y-5)<5 )) x_fal_utkozes = true;
+            //if(ujY > f.hely.y-5 && Math.abs(ujY - f.hely.y-5)<5) y_fal_utkozes = true;
         }
 
 

@@ -15,6 +15,7 @@ public class Palya_kliens implements Runnable{
 
     public Palya_kliens(String host1,Field f1) {
         myField = f1;
+
         host = host1;
 
 
@@ -23,14 +24,19 @@ public class Palya_kliens implements Runnable{
             clientSocket = new Socket("localhost",PORT_NUMBER);
             this.clientReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             clientWriter = new PrintWriter(clientSocket.getOutputStream());
+            //Thread.sleep(1000);
         }catch (IOException e){
             System.err.println("fail to connect");
             WaitingFrame.setMessege("fail");
+        //} catch (InterruptedException e) {
+          //  throw new RuntimeException(e);
         }
 
         if (clientSocket != null) {
+
             System.err.println("Kliens : clientSocket NOT null");
             WaitingFrame.setMessege("success");
+            new Thread(myField).start();
         }
         else {
             System.err.println("Kliens : clientSocket null");
@@ -67,10 +73,12 @@ public class Palya_kliens implements Runnable{
     public static void setHost(String host) {Palya_kliens.host = host;  }
     public static String getPORT_NUMBER() { return valueOf(PORT_NUMBER);  }
     public static void setPORT_NUMBER(int newport) { PORT_NUMBER = newport;  }
+    protected static void ennyi_baranyod_van(int ennyi_baranyom_van){baranyaim = ennyi_baranyom_van;}
     /// ----------------------------------------------------------------------------------------
     /// ----------------------------------------------------------------------------------------
 
 
+    private static int baranyaim = 0;
 
 
 
@@ -93,13 +101,18 @@ public class Palya_kliens implements Runnable{
                         clientSocket.close();
                         return;
                     }else {
+                        System.out.println("Kliens 1 "+ kapott_allat);
                         // TODO -----------------------------------------------------------------------
                         // TODO -----------------------------------------------------------------------
                         // EZ MÉG CSAK JOBBRA MŰKÖDIK
 
                         if (kapott_allat.substring(0, 6).equals("Barany")) {
+                            System.out.println("Kliens 2 "+ kapott_allat);
                             int number = convert_StringMessege_to_int(kapott_allat);
+                            System.out.println("Kliens 3 "+ kapott_allat);
+
                             myField.addBarany(number);
+                            System.out.println("Kliens 4 "+ kapott_allat);
                         } else if (kapott_allat.substring(0,6).equals("Farkas")) {
                             int number = convert_StringMessege_to_int(kapott_allat);
                             myField.addFarkas(number);
@@ -110,6 +123,7 @@ public class Palya_kliens implements Runnable{
                         // TODO -----------------------------------------------------------------------
                         // TODO -----------------------------------------------------------------------
                     }
+                    System.out.println("Kliens 5 "+ kapott_allat);
 
                 }
 

@@ -10,7 +10,7 @@ public class Main {
         new WaitingFrame(2);
 
 
-        /*while(true){
+        while(true){
             int activeThreads = Thread.activeCount();
             System.out.println("Jelenleg futó szálak száma: " + activeThreads);
             // main
@@ -20,6 +20,6 @@ public class Main {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-        }*/
+        }
     }
 }

@@ -3,14 +3,12 @@ package org.example;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 
 import javax.swing.*;
 
 public class WaitingFrame extends JFrame implements ActionListener {
     protected Label label1;
     protected Label label2;
-    protected TextField text;
     protected JButton button1;
     protected JButton button2;
     protected JFrame frame = new JFrame();
@@ -22,8 +20,6 @@ public class WaitingFrame extends JFrame implements ActionListener {
     public static void setMessege(String mess){
         messege = mess;
     }
-
-    private Palya_kliens p;
 
 
 
@@ -102,7 +98,7 @@ public class WaitingFrame extends JFrame implements ActionListener {
             // JAVA EZ MI A FASZOM, LEHET ÉN VAGYOK A BUTA DE FÉL KURVA NAPOM ELMENT EZZEL
             t1.start();
             // new Thread(new Palya_kliens("localhost",f2)).start();
-            f2.run();
+            //f2.run();
             frame.dispose();
         }else{
             reconnect();
@@ -117,38 +113,24 @@ public class WaitingFrame extends JFrame implements ActionListener {
 
 
 
-
-
+    public void kapcsolat_indul(){
+        frame.dispose();
+    }
+    boolean csukd_be= true;
     private void SZERVER_INDUL() throws InterruptedException {
-        /*if(messege.equals("success")){
-            System.out.println("XXXX");
-            f1 = new Field(1,true);
-            f1.run();
-            frame.dispose();
-        }*/
+
+        f1 = new Field(1,true);
+        new Thread(new Palya(f1)).start();
+
+
         // WAITING -------------------------
-        //else{
-            //button1.setVisible(false);
-            //button2.setVisible(false);
-            //label2.setVisible(false);
-            //label1.setText("Waiting for Player2");
-            f1 = new Field(1,true);
-            new Thread(new Palya(f1)).start();
+            button1.setVisible(false);
+            button2.setVisible(false);
+            label2.setVisible(false);
+            label1.setText("Waiting for Player2");
 
 
-            // Az istenért nem akar működni
-            // todo
-            // todo
-            //this.f1 = new Field(1,false); ---> ez az eredeti
-            f1.run();
-            frame.dispose();
-            // todo
-            // todo
-            /// -----------------------------------------------------
-            /// ------------ide kell vmi ami figyeli    -------------
-            /// ------------hogy csatlakozott-e a masik -------------
-            /// -----------------------------------------------------
-        //}
+
     }
 
 
