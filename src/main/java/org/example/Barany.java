@@ -7,7 +7,8 @@ public class Barany extends Allat implements Runnable{
 
     @Override
     public void run() {
-        System.out.println("Barany fut");
+        // TODO -------------------------
+        //System.out.println("Barany fut");
         while (running) {
             try {
                 Thread.sleep(10000);

@@ -11,6 +11,7 @@ public class WaitingFrame extends JFrame implements ActionListener {
     protected Label label2;
     protected JButton button1;
     protected JButton button2;
+    protected JButton button3;
     protected JFrame frame = new JFrame();
     protected int playernumber;
     static String messege = " ";
@@ -20,7 +21,6 @@ public class WaitingFrame extends JFrame implements ActionListener {
     public static void setMessege(String mess){
         messege = mess;
     }
-
 
 
 
@@ -44,10 +44,15 @@ public class WaitingFrame extends JFrame implements ActionListener {
         button2.setBounds(250,100,200,50);
         button2.addActionListener(this);
 
+        button3 = new JButton("Exit");
+        button3.setBounds(250,170,200,50);
+        button3.addActionListener(this);
+
         frame.add(button1);
         frame.add(label1);
         frame.add(label2);
         frame.add(button2);
+        frame.add(button3);
         if(playernumber ==1) frame.setLocation(100, 100);
         if(playernumber ==2) frame.setLocation(700, 100);
         frame.setTitle("PLAYER -  " + playernumber);
@@ -85,14 +90,18 @@ public class WaitingFrame extends JFrame implements ActionListener {
             frame.dispose();
             new ChangePortFrame(playernumber);
         }
+        else if(e.getSource()==button3){
+
+            frame.dispose();
+        }
     }
 
 
-
+    Object _lock= new Object();
     private void KLIENS_PROBAL_CSATLAKOZNI() {
-        Field f2 = new Field(2,true);
+        Field f2 = new Field(2,true,_lock);
         //Palya_kliens kliens = new Palya_kliens("localhost",f2);
-        Thread t1 = new Thread(new Palya_kliens("localhost",f2));
+        Thread t1 = new Thread(new Palya_kliens("localhost",f2,_lock));
         if(messege.equals("success")){
             // HA EZT ITT NEM TESZED MEG, AKKOR 1 SZÁLUNK FUT EZ MEG A KLIENS MEG A FIELD XDDD
             // JAVA EZ MI A FASZOM, LEHET ÉN VAGYOK A BUTA DE FÉL KURVA NAPOM ELMENT EZZEL
@@ -112,24 +121,25 @@ public class WaitingFrame extends JFrame implements ActionListener {
     }
 
 
-
+    Object _lock2= new Object();
     public void kapcsolat_indul(){
         frame.dispose();
     }
     boolean csukd_be= true;
     private void SZERVER_INDUL() throws InterruptedException {
 
-        f1 = new Field(1,true);
+        f1 = new Field(1,true,_lock2);
 
         // todo    CSAK ELSORE
         // todo
-        new Thread(new Palya(f1,this)).start();
+        new Thread(new Palya(f1,this,_lock2)).start();
         // todo
         // todo
 
         // WAITING -------------------------
             button1.setVisible(false);
             button2.setVisible(false);
+            // button3.setVisible(false);
             label2.setVisible(false);
             label1.setText("Waiting for Player2");
 

@@ -10,14 +10,21 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
     private static int PORT_NUMBER= 19999;
     protected BufferedReader clientReader;
     protected static PrintWriter clientWriter;
+    private Thread MyField_thread;
     Field myField;
     //private ObjectInputStream inputStream;
     //private ObjectOutputStream outputStream;
+    Object lock;
+    Palya_szerver(Socket _clientSocket, Field f1, WaitingFrame w1,Object _lock) throws IOException {
 
-    Palya_szerver(Socket _clientSocket, Field f1, WaitingFrame w1) throws IOException {
+        lock = _lock;
         Myw1 =w1;
         myField = f1;
-        new Thread(myField).start();
+        //myField.setLock(lock);
+
+
+        MyField_thread = new Thread(myField);
+        MyField_thread.start();
         this.clientSocket = _clientSocket;
         this.clientReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         clientWriter = new PrintWriter(clientSocket.getOutputStream()); //
@@ -59,9 +66,23 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
                     else if (kapott_allat.startsWith("game_over")) {
                         // kapott uzenet ugy nez ki, hogy "game_over 2", ahol a szam a masik jatekos baranyait jelent
                         int masik_baranyai = convert_StringMessege_to_int(kapott_allat);
-                        new Ending_Frame(baranyaim,masik_baranyai,playernumber);
-                        clientSocket.close();
-                        return;
+
+
+                        // todo --- ez nem működik sajnos
+                        //  todo ---
+                        //MyField_thread.join();
+                        System.out.println("1");
+                        synchronized (lock){
+                            System.out.println("2");
+                            lock.wait(100);
+                            System.out.println("5");
+                            new Ending_Frame(baranyaim,masik_baranyai,playernumber);
+                            System.out.println("SZERVER : ÉnBaranyaim-"+  baranyaim + "  KliensBaranyai-"+masik_baranyai);
+                        }
+                        //  todo ---
+                        //  todo ---
+                        //clientSocket.close();
+                        break;
                     }
                     else{
                         // TODO -----------------------------------------------------------------------
@@ -131,7 +152,7 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
         }
     }
 
-    private static int baranyaim = 0;
+    private static int baranyaim = -1;
     private static int baranyai_a_masiknak = 0;
     protected static void ennyi_baranyod_van(int ennyi_baranyom_van){
         baranyaim = ennyi_baranyom_van;

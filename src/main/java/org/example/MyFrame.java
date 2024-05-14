@@ -28,6 +28,9 @@ public class MyFrame extends JFrame implements MouseListener {
         this.setVisible(true);
     }
 
+    public static void setLock(Object lock) {
+    }
+
     @Override
     public void mouseClicked(MouseEvent e) {
 

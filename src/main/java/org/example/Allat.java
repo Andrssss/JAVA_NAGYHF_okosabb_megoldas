@@ -28,8 +28,13 @@ public abstract class Allat implements Runnable {
         boolean x_fal_utkozes = false;
         boolean y_fal_utkozes = false;
         for(Falak f : falak){
-            if(ujX >= f.hely.x-5 && (Math.abs(ujY - f.hely.y-5)<5 )) x_fal_utkozes = true;
-            //if(ujY > f.hely.y-5 && Math.abs(ujY - f.hely.y-5)<5) y_fal_utkozes = true;
+            // todo ----------
+            // todo ----------
+            if((Math.abs(ujX - f.hely.x-5)<5)  && (Math.abs(ujY - f.hely.y-5)<5 )) x_fal_utkozes = true;
+            if((Math.abs(ujX - f.hely.x+5)>5)  && (Math.abs(ujY - f.hely.y-5)<5 )) x_fal_utkozes = true;
+            //if(ujX < f.hely.x+5 && (Math.abs(ujY - f.hely.y-5)<5 )) x_fal_utkozes = true;
+            // todo ----------
+            // todo ----------
         }
 
 

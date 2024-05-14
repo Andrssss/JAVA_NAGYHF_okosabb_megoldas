@@ -11,7 +11,8 @@ public class Farkas extends Allat implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Farkas fut");
+        // TODO -------------------------
+        //System.out.println("Farkas fut");
         while (running) {
             try {
                 Thread.sleep(10000);

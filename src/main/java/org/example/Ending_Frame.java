@@ -29,15 +29,16 @@ public class Ending_Frame extends JFrame implements ActionListener {
         button1.setBounds(25,100,200,50);
         button1.addActionListener(this);
 
-        // todo ez okozhat bajt
-        // todo----------------
+
         button2 = new JButton("exit");
         button2.setBounds(25,100,200,50);
         button2.addActionListener(this);
         // todo----------------
         // todo----------------
-        frame.add(button1);
-        frame.add(button2);
+        //frame.add(button1);
+        //frame.add(button2);
+        // todo ez okozhat bajt
+        // todo----------------
         frame.add(label1);
         //frame.add(label2);
 
@@ -52,13 +53,15 @@ public class Ending_Frame extends JFrame implements ActionListener {
     }
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource()==button1){
-            if(playernumber==1) // ha szerver, akkor a wárakozás player 2 -re kell
+        /*if(e.getSource()==button1){
+            if(playernumber==1) // todo valami  ha szerver, akkor a wárakozás player 2 -re kell
             new WaitingFrame(playernumber);
+            Palya.running = false;
             frame.dispose();
         }
         if(e.getSource()==button2){
-            frame.dispose();
-        }
+            //Palya.running = false;
+            //frame.dispose();
+        }*/
     }
 }

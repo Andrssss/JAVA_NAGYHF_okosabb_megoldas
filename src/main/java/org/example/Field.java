@@ -27,6 +27,8 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
     }
 
 
+    Object lock;
+
     public void AllatokMozog(){
         if(!game_over) {
             ArrayList<Barany> remove_b_list = new ArrayList<>();
@@ -148,9 +150,13 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
 
 
 
+    /*public void setLock(Object _lock){
+        lock = _lock;
+    }*/
 
 
-    Field(int _playernumber,boolean readyornot) {
+    Field(int _playernumber,boolean readyornot,Object _lock) {
+        lock = _lock;
         if(_playernumber == 2 ) READY_TO_SAND = true;
         //this.palya_szerver = palya_szerver1;
         //this.palya_kliens = palya_kliens1;
@@ -215,24 +221,25 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                 throw new RuntimeException(e);
             }
             if(game_over){
-                for(Barany b : b_list){
-                    ennyi_baranyom_van++;
+                synchronized (lock){
+                    for(Barany b : b_list){
+                        ennyi_baranyom_van++;
+                    }
+                    for(Farkas b : f_list){
+                        b.stopRunning();
+                    }
+                    for(Barany b : b_list){
+                        b.stopRunning();
+                    }
+
+                    if(playernumber == 1) Palya_szerver.ennyi_baranyod_van(ennyi_baranyom_van);
+                    if(playernumber == 2) Palya_kliens.ennyi_baranyod_van(ennyi_baranyom_van);
+                    lock.notify();
+                    //System.out.println("Player" +playernumber +" - "+ ennyi_baranyom_van);
+                    frame.dispose();
+
                 }
-                System.out.println("Player" +playernumber +" - "+ ennyi_baranyom_van);
 
-
-
-                for(Farkas b : f_list){
-                    b.stopRunning();
-                }
-                for(Barany b : b_list){
-                    b.stopRunning();
-                }
-                if(playernumber == 1) Palya_szerver.ennyi_baranyod_van(ennyi_baranyom_van);
-                if(playernumber == 2) Palya_kliens.ennyi_baranyod_van(ennyi_baranyom_van);
-
-
-                frame.dispose();
 
                 //
                 // todo --------------------------------
@@ -283,7 +290,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
     // -------------------------------------------------------------------------------
     public void setReadyToRockAndRoll(boolean _readyToRockAndRoll) {
         this.readyToRockAndRoll = _readyToRockAndRoll;
-        System.out.println(readyToRockAndRoll);
+        //System.out.println(readyToRockAndRoll);
         frame.repaint();
     }
     public ArrayList<Barany> getBaranyok() { return b_list; }

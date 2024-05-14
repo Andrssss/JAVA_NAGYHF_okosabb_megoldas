@@ -13,9 +13,10 @@ import static java.lang.String.valueOf;
 public class Palya_kliens implements Runnable{
 
 
-    public Palya_kliens(String host1,Field f1) {
+    public Palya_kliens(String host1,Field f1,Object _lock) {
         myField = f1;
-
+        //myField.setLock(lock);
+        lock = _lock;
         host = host1;
 
 
@@ -36,7 +37,8 @@ public class Palya_kliens implements Runnable{
 
             System.err.println("Kliens : clientSocket NOT null");
             WaitingFrame.setMessege("success");
-            new Thread(myField).start();
+            MyField_thread = new Thread(myField);
+            MyField_thread.start();
         }
         else {
             System.err.println("Kliens : clientSocket null");
@@ -51,7 +53,8 @@ public class Palya_kliens implements Runnable{
     protected static PrintWriter clientWriter;
     protected BufferedReader clientReader;
     private static final int playernumber = 2;
-
+    private Thread MyField_thread;
+    Object lock = new Object();
 
 
 
@@ -86,7 +89,7 @@ public class Palya_kliens implements Runnable{
     /// ----------------------------------------------------------------------------------------
 
 
-    private static int baranyaim = 0;
+    private static int baranyaim = -1;
 
 
 
@@ -102,15 +105,25 @@ public class Palya_kliens implements Runnable{
                     //String kapott_allat = clientReader.readLine();
                     System.out.println("Kliens Uzenet : "+ kapott_allat);
                     if (kapott_allat == null || kapott_allat.isEmpty()) {
-                        System.out.println("Kliens : Uzenet ures");
+                        //System.out.println("Kliens : Uzenet ures");
                         //Thread.sleep(1000);
                     }
                     else if (kapott_allat.startsWith("game_over")) {
                         // kapott uzenet ugy nez ki, hogy "game_over 2", ahol a szam a masik jatekos baranyait jelent
                         int masik_baranyai = convert_StringMessege_to_int(kapott_allat);
-                        new Ending_Frame(baranyaim,masik_baranyai,playernumber);
-                        clientSocket.close();
-                        return;
+
+
+
+                        // todo --- ennek meg kell várnia, míg a Field kihal
+                        //MyField_thread.join();
+                        synchronized (lock){
+                            lock.wait(100);
+                            new Ending_Frame(baranyaim,masik_baranyai,playernumber);
+                            System.out.println("KLIENS : ÉnBaranyaim-"+  baranyaim + "  KliensBaranyai-"+masik_baranyai);
+                        }
+                        break;
+                        //  todo --- itt nem szabad bezárni
+                        //clientSocket.close();
                     }else {
                         System.out.println("Kliens 1 "+ kapott_allat);
                         // TODO -----------------------------------------------------------------------
@@ -151,6 +164,8 @@ public class Palya_kliens implements Runnable{
             catch (IOException e){
             //catch (IOException | InterruptedException e){
                 e.printStackTrace();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
             System.out.println("Kliens : true vége");
             try {
@@ -176,6 +191,7 @@ public class Palya_kliens implements Runnable{
             } catch (NumberFormatException e) {
                 System.err.println("Invalid integer input");
             }
+            System.out.println("Kliens :  szerver baranyai : " + number);
             return number;
         }
     protected Field myField=null;
