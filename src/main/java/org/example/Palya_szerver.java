@@ -5,6 +5,8 @@ import java.net.SocketTimeoutException;
 
 public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OLDALT
     protected static Socket clientSocket;
+
+    private static final int playernumber = 1;
     private static int PORT_NUMBER= 19999;
     protected BufferedReader clientReader;
     protected static PrintWriter clientWriter;
@@ -12,7 +14,8 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
     //private ObjectInputStream inputStream;
     //private ObjectOutputStream outputStream;
 
-    Palya_szerver(Socket _clientSocket, Field f1) throws IOException {
+    Palya_szerver(Socket _clientSocket, Field f1, WaitingFrame w1) throws IOException {
+        Myw1 =w1;
         myField = f1;
         new Thread(myField).start();
         this.clientSocket = _clientSocket;
@@ -53,7 +56,10 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
                         //System.out.println("Szerver : Uzenet ures");
                         //Thread.sleep(1000);
                     }
-                    else if (kapott_allat.equals("game_over")) {
+                    else if (kapott_allat.startsWith("game_over")) {
+                        // kapott uzenet ugy nez ki, hogy "game_over 2", ahol a szam a masik jatekos baranyait jelent
+                        int masik_baranyai = convert_StringMessege_to_int(kapott_allat);
+                        new Ending_Frame(baranyaim,masik_baranyai,playernumber);
                         clientSocket.close();
                         return;
                     }
@@ -62,12 +68,20 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
                         // TODO -----------------------------------------------------------------------
                         // EZ MÉG CSAK JOBBRA MŰKÖDIK
                         if(kapott_allat.substring(0,6).equals("Barany")){
-                            int number = convert_StringMessege_to_int(kapott_allat);
-                            myField.addBarany(number);
+                            //int number = convert_StringMessege_to_int(kapott_allat);
+                            //myField.addBarany(number);
+                            String[] szavak = kapott_allat.split(" ");
+                            int x = Integer.parseInt(szavak[1]);
+                            int y = Integer.parseInt(szavak[2]);
+                            myField.addBarany(x,y);
                         }
                         else if(kapott_allat.substring(0,6).equals("Farkas")){
-                            int number = convert_StringMessege_to_int(kapott_allat);
-                            myField.addFarkas(number);
+                            //int number = convert_StringMessege_to_int(kapott_allat);
+                            //myField.addFarkas(number);
+                            String[] szavak = kapott_allat.split(" ");
+                            int x = Integer.parseInt(szavak[1]);
+                            int y = Integer.parseInt(szavak[2]);
+                            myField.addFarkas(x,y);
                         }else {
                             System.out.println("Palya_szerver kapott uzenet : " + kapott_allat);
                         }
@@ -118,10 +132,18 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
     }
 
     private static int baranyaim = 0;
+    private static int baranyai_a_masiknak = 0;
     protected static void ennyi_baranyod_van(int ennyi_baranyom_van){
         baranyaim = ennyi_baranyom_van;
+        try {
+            sendLine("game_over"+baranyaim);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
+    // "Barany - "
+    // "game_over"
     private int convert_StringMessege_to_int(String kapott_allat){
         String remainingText = kapott_allat.substring(9);
         System.out.println(remainingText);
@@ -139,9 +161,11 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
         }
         return number;
     }
+
+
     private static WaitingFrame Myw1;
     public static void main(String[] args) {
-        WaitingFrame w1 = new WaitingFrame(1);
+        WaitingFrame w1 = new WaitingFrame(playernumber);
         Myw1 = w1;
     }
 }

@@ -7,17 +7,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public final class Field  extends JFrame  implements MouseListener, Runnable {
-
-
-
-
-    public void addBarany(int number){
+    public void addBarany(int x,int y){
         //System.out.println("Barany - y : " + number+ " Player" + playernumber);
-        // todo ---------
-        // todo --------- Az nem 0, hanem attól függ, hogy merre lett küldve
-        Barany b = new Barany(0,number);
-        // todo ---------
-        // todo ---------
+        Barany b = new Barany(x,y);
         b.setGazdi(playernumber);
         b_list.add(b);
         //b.run(); EZ úgy megszopatott, de úgy .... Már negyedjére XDDDD
@@ -25,9 +17,9 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
         new Thread(b).start();
     }
 
-    public void addFarkas(int number){
-        System.out.println("Farkas - y : " + number + " Player" + playernumber);
-        Farkas f = new Farkas(0, number);
+    public void addFarkas(int x,int y){
+        //System.out.println("Farkas - y : " + number + " Player" + playernumber);
+        Farkas f = new Farkas(x, y);
         f.setGazdi(playernumber);
         f_list.add(f);
         //f.run();
@@ -51,7 +43,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                             b.stopRunning();
 
                             try {
-                                Palya_szerver.sendLine("Barany - " + y_hely);
+                                Palya_szerver.sendLine("Barany "+ 0 +" "+ y_hely);
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
@@ -69,7 +61,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                             int y_hely = (int) b.hely.y;
                             b.stopRunning();
                             try {
-                                Palya_kliens.sendLine("Barany - " + y_hely);
+                                Palya_kliens.sendLine("Barany "+ (palyameret_y-5) +" "+ y_hely);
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
@@ -92,7 +84,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                             int y_hely = (int) b.hely.y;
                             b.stopRunning();
                             try {
-                                Palya_szerver.sendLine("Farkas - " + y_hely);
+                                Palya_szerver.sendLine("Farkas "+ 0 +" "+ y_hely);
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
@@ -109,7 +101,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                             int y_hely = (int) b.hely.y;
                             b.stopRunning();
                             try {
-                                Palya_kliens.sendLine("Farkas - " + y_hely);
+                                Palya_kliens.sendLine("Farkas "+ (palyameret_y-5) +" "+ y_hely);
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
@@ -238,12 +230,14 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                 }
                 if(playernumber == 1) Palya_szerver.ennyi_baranyod_van(ennyi_baranyom_van);
                 if(playernumber == 2) Palya_kliens.ennyi_baranyod_van(ennyi_baranyom_van);
-                //frame.dispose();
-                //label1.setText("game over");
 
-                // todo --------------
-                // todo --------------
-                // todo --------------
+
+                frame.dispose();
+
+                //
+                // todo --------------------------------
+                // todo -------END SCREEN NYITÁS -------
+                // todo --------------------------------
                 // mouse listenert kilőni
                 // vissza küldeni, hogy hány bárányom van
                 // aztán végeredmény kijelzo

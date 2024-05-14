@@ -2,7 +2,7 @@ package org.example;
 
 public class Main {
     public static void main(String[] args) {
-
+        // szerver
         new WaitingFrame(1);
 
 

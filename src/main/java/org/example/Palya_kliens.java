@@ -50,6 +50,7 @@ public class Palya_kliens implements Runnable{
     protected static String host="localhost";
     protected static PrintWriter clientWriter;
     protected BufferedReader clientReader;
+    private static final int playernumber = 2;
 
 
 
@@ -73,7 +74,14 @@ public class Palya_kliens implements Runnable{
     public static void setHost(String host) {Palya_kliens.host = host;  }
     public static String getPORT_NUMBER() { return valueOf(PORT_NUMBER);  }
     public static void setPORT_NUMBER(int newport) { PORT_NUMBER = newport;  }
-    protected static void ennyi_baranyod_van(int ennyi_baranyom_van){baranyaim = ennyi_baranyom_van;}
+    protected static void ennyi_baranyod_van(int ennyi_baranyom_van){
+        baranyaim = ennyi_baranyom_van;
+        try {
+            sendLine("game_over"+baranyaim);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
     /// ----------------------------------------------------------------------------------------
     /// ----------------------------------------------------------------------------------------
 
@@ -97,7 +105,10 @@ public class Palya_kliens implements Runnable{
                         System.out.println("Kliens : Uzenet ures");
                         //Thread.sleep(1000);
                     }
-                    else if (kapott_allat.equals("game_over")) {
+                    else if (kapott_allat.startsWith("game_over")) {
+                        // kapott uzenet ugy nez ki, hogy "game_over 2", ahol a szam a masik jatekos baranyait jelent
+                        int masik_baranyai = convert_StringMessege_to_int(kapott_allat);
+                        new Ending_Frame(baranyaim,masik_baranyai,playernumber);
                         clientSocket.close();
                         return;
                     }else {
@@ -107,23 +118,32 @@ public class Palya_kliens implements Runnable{
                         // EZ MÉG CSAK JOBBRA MŰKÖDIK
 
                         if (kapott_allat.substring(0, 6).equals("Barany")) {
-                            System.out.println("Kliens 2 "+ kapott_allat);
-                            int number = convert_StringMessege_to_int(kapott_allat);
-                            System.out.println("Kliens 3 "+ kapott_allat);
+                            String[] szavak = kapott_allat.split(" ");
+                            int x = Integer.parseInt(szavak[1]);
+                            int y = Integer.parseInt(szavak[2]);
+                            myField.addBarany(x,y);
 
-                            myField.addBarany(number);
-                            System.out.println("Kliens 4 "+ kapott_allat);
+                            //System.out.println("Kliens 2 "+ kapott_allat);
+                            //int number = convert_StringMessege_to_int(kapott_allat);
+                            //System.out.println("Kliens 3 "+ kapott_allat);
+
+
+                            //System.out.println("Kliens 4 "+ kapott_allat);
                         } else if (kapott_allat.substring(0,6).equals("Farkas")) {
-                            int number = convert_StringMessege_to_int(kapott_allat);
-                            myField.addFarkas(number);
+                            String[] szavak = kapott_allat.split(" ");
+                            int x = Integer.parseInt(szavak[1]);
+                            int y = Integer.parseInt(szavak[2]);
+                            myField.addFarkas(x,y);
+                            //int number = convert_StringMessege_to_int(kapott_allat);
+                            //myField.addFarkas(number);
                         } else {
-                            System.out.println("KLIENS kapott uzenet : " + kapott_allat);
+                            System.err.println("KLIENS kapott uzenet : " + kapott_allat);
                         }
                         // itt kell elinditani a jatekot
                         // TODO -----------------------------------------------------------------------
                         // TODO -----------------------------------------------------------------------
                     }
-                    System.out.println("Kliens 5 "+ kapott_allat);
+                    //System.out.println("Kliens 5 "+ kapott_allat);
 
                 }
 
@@ -133,8 +153,6 @@ public class Palya_kliens implements Runnable{
                 e.printStackTrace();
             }
             System.out.println("Kliens : true vége");
-            //Listener_Thread listener = new Listener_Thread(clientSocket);
-            //listener.run();
             try {
                 clientSocket.close();
             } catch (IOException e) {
@@ -150,13 +168,10 @@ public class Palya_kliens implements Runnable{
 
         private int convert_StringMessege_to_int(String kapott_allat){
             String remainingText = kapott_allat.substring(9);
-            //System.out.println(remainingText);
-
             int number=0;
 
             try {
                 number = Integer.valueOf(remainingText);
-                //System.out.println("Converted integer: " + number);
 
             } catch (NumberFormatException e) {
                 System.err.println("Invalid integer input");
@@ -164,9 +179,7 @@ public class Palya_kliens implements Runnable{
             return number;
         }
     protected Field myField=null;
-    public void setMyField(Field f1){
-        myField = f1;
-    }
+
     public static void main(String[] args) {
         new WaitingFrame(2);
     }

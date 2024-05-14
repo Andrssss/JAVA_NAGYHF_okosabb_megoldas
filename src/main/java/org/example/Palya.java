@@ -25,13 +25,15 @@ public class Palya implements Runnable{
     private static int timeout ;
 
     Field myField ;
+    WaitingFrame myw1;
 
 
     /**
      * KONSTUKTOR
      */
-    public Palya(Field f1)  {
+    public Palya(Field f1,WaitingFrame w1)  {
         try {
+            myw1 =w1;
             myField = f1;
             clientSocket = null;
             serverSocket = new ServerSocket(PORT_NUMBER);
@@ -77,7 +79,7 @@ public class Palya implements Runnable{
 
                     try {
                         clientSocket = serverSocket.accept(); // itt elfogadja a kérést és nyit egy socketet
-                        new Palya_szerver(clientSocket,myField).run();
+                        new Palya_szerver(clientSocket,myField,myw1).run();
 
                     } catch (java.net.SocketTimeoutException ste) {
                         // Itt fut le, ha timeout történik
@@ -96,6 +98,7 @@ public class Palya implements Runnable{
             throw new RuntimeException(e);
         }
         try {
+            System.out.println("SERVER : socket close");
             serverSocket.close();
         } catch (IOException e) {
             e.printStackTrace();

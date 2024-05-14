@@ -120,8 +120,12 @@ public class WaitingFrame extends JFrame implements ActionListener {
     private void SZERVER_INDUL() throws InterruptedException {
 
         f1 = new Field(1,true);
-        new Thread(new Palya(f1)).start();
 
+        // todo    CSAK ELSORE
+        // todo
+        new Thread(new Palya(f1,this)).start();
+        // todo
+        // todo
 
         // WAITING -------------------------
             button1.setVisible(false);

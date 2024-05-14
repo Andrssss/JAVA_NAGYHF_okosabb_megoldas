@@ -16,7 +16,7 @@ public abstract class Allat implements Runnable {
 
     public synchronized String randomMozgas(ArrayList<Falak> falak) {
         // Generálunk véletlenszerű irányokat
-        int irany_x =5;
+        int irany_x =-5;
         int irany_y = ThreadLocalRandom.current().nextInt(-1, 2); // -1, 0, vagy 1 lehet az irány
 
         // Beállítjuk az új pozíciót a véletlenszerű irányok alapján
