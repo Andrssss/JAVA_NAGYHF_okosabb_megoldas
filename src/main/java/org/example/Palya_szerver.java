@@ -1,31 +1,27 @@
 package org.example;
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 
 public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OLDALT
-    protected static Socket clientSocket;
-
+    private static Socket clientSocket;
     private static final int playernumber = 1;
-    private static int PORT_NUMBER= 19999;
-    protected BufferedReader clientReader;
+    private static final int PORT_NUMBER= 19999;
+    private final BufferedReader clientReader;
     protected static PrintWriter clientWriter;
-    private Thread MyField_thread;
-    Field myField;
-    //private ObjectInputStream inputStream;
-    //private ObjectOutputStream outputStream;
-    Object lock;
-    Palya_szerver(Socket _clientSocket, Field f1, WaitingFrame w1,Object _lock) throws IOException {
+    private Field myField;
+    private final Object lock;
+    private static WaitingFrame Myw1;
+    private static int baranyaim = -1;
+    private boolean running = true;
 
+
+
+
+    Palya_szerver(Socket _clientSocket, Field f1, WaitingFrame w1,Object _lock) throws IOException {
         lock = _lock;
         Myw1 =w1;
         myField = f1;
-        //myField.setLock(lock);
-
-
-        MyField_thread = new Thread(myField);
-        MyField_thread.start();
-        this.clientSocket = _clientSocket;
+        clientSocket = _clientSocket;
         this.clientReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         clientWriter = new PrintWriter(clientSocket.getOutputStream()); //
         //this.outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -42,21 +38,36 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
 
 
 
+    public void close(){
+        try {
+            Field.setGame_over(true);
+            running = false;
+            clientSocket.close();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Minden beszelgetesnek kulon szala van. 2 dolog van amit vedeni kell a tobbszalusagtol -> check_out_item() & addnewitem()
      */
     /// ---------------------------------   RUN      -------------------------------------------
     /// ----------------------------------------------------------------------------------------
     public void run() {
+        System.out.println("Palya_szerver fut");
         try {
             //BufferedReader serverInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
             if(clientSocket.isConnected()) {
-                if(Myw1!= null)Myw1.kapcsolat_indul();
+                new Thread(myField).run();
+                if(Myw1!= null)  Myw1.close();
+
 
                 System.out.println("PLAYER1       - KAPCSOLAT ELINDULT A : " + clientSocket.getPort() + " -AL");
 
-                while(true){
+                while(running){
+                    System.out.println("Palya_szerver fut");
                     String kapott_allat = clientReader.readLine();
 
                     if (kapott_allat == null || kapott_allat.isEmpty()){
@@ -68,37 +79,22 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
                         int masik_baranyai = convert_StringMessege_to_int(kapott_allat);
 
 
-                        // todo --- ez nem működik sajnos
-                        //  todo ---
-                        //MyField_thread.join();
-                        System.out.println("1");
                         synchronized (lock){
-                            System.out.println("2");
                             lock.wait(100);
-                            System.out.println("5");
                             new Ending_Frame(baranyaim,masik_baranyai,playernumber);
                             System.out.println("SZERVER : ÉnBaranyaim-"+  baranyaim + "  KliensBaranyai-"+masik_baranyai);
                         }
-                        //  todo ---
-                        //  todo ---
                         //clientSocket.close();
                         break;
                     }
                     else{
-                        // TODO -----------------------------------------------------------------------
-                        // TODO -----------------------------------------------------------------------
-                        // EZ MÉG CSAK JOBBRA MŰKÖDIK
                         if(kapott_allat.substring(0,6).equals("Barany")){
-                            //int number = convert_StringMessege_to_int(kapott_allat);
-                            //myField.addBarany(number);
                             String[] szavak = kapott_allat.split(" ");
                             int x = Integer.parseInt(szavak[1]);
                             int y = Integer.parseInt(szavak[2]);
                             myField.addBarany(x,y);
                         }
                         else if(kapott_allat.substring(0,6).equals("Farkas")){
-                            //int number = convert_StringMessege_to_int(kapott_allat);
-                            //myField.addFarkas(number);
                             String[] szavak = kapott_allat.split(" ");
                             int x = Integer.parseInt(szavak[1]);
                             int y = Integer.parseInt(szavak[2]);
@@ -106,25 +102,9 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
                         }else {
                             System.out.println("Palya_szerver kapott uzenet : " + kapott_allat);
                         }
-                        // itt kell elinditani a jatekot
-                        // TODO -----------------------------------------------------------------------
-                        // TODO -----------------------------------------------------------------------
                     }
 
                 }
-
-
-
-                ///Thread receiverThread = new Thread(this::receiveObjects);
-                ///receiverThread.start();
-                ///receiverThread.join();
-
-
-                //Thread senderThread = new Thread(this::sendObjects);
-                //senderThread.start();
-                //senderThread.join();
-
-
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -152,8 +132,6 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
         }
     }
 
-    private static int baranyaim = -1;
-    private static int baranyai_a_masiknak = 0;
     protected static void ennyi_baranyod_van(int ennyi_baranyom_van){
         baranyaim = ennyi_baranyom_van;
         try {
@@ -163,8 +141,9 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
         }
     }
 
-    // "Barany - "
-    // "game_over"
+
+
+
     private int convert_StringMessege_to_int(String kapott_allat){
         String remainingText = kapott_allat.substring(9);
         System.out.println(remainingText);
@@ -184,7 +163,7 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
     }
 
 
-    private static WaitingFrame Myw1;
+
     public static void main(String[] args) {
         WaitingFrame w1 = new WaitingFrame(playernumber);
         Myw1 = w1;

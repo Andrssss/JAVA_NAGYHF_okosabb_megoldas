@@ -37,10 +37,9 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
             for (Barany b : b_list) {
                 String eredmeny = b.randomMozgas(fal_list);
 
-                if (!eredmeny.equals("sima")) {
+                if (!eredmeny.equals("marad")) {
                     if (eredmeny.equals("jobbra")) {
                         if (b.jobbra_atmehet && b.gazdi == 1 && READY_TO_SAND) {
-                            //System.out.println("barany kuldes jobbra");
                             int y_hely = (int) b.hely.y;
                             b.stopRunning();
 
@@ -49,17 +48,10 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
-                            // todo itt meg kell állítani a szálat
-                            //b_list.remove(b);
                             remove_b_list.add(b);
-                        } else {
-                            //System.out.println("Barany felrement valami");
                         }
                     } else if (eredmeny.equals("balra")) {
                         if (b.balra_atmehet && b.gazdi == 2 && READY_TO_SAND) {
-                            //System.out.println("barany kuldes balra");
-                            //b.gazdi = 1;
-                            //palya_kliens.sendObjects(b);
                             int y_hely = (int) b.hely.y;
                             b.stopRunning();
                             try {
@@ -68,9 +60,6 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                                 throw new RuntimeException(e);
                             }
                             remove_b_list.add(b);
-                            //b_list.remove(b);
-                        } else {
-                            //System.out.println("Valami felrement");
                         }
                     }
                 }
@@ -78,11 +67,9 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
             for (Farkas b : f_list) {
                 String eredmeny = b.randomMozgas(fal_list);
 
-                if (!eredmeny.equals("sima")) {
+                if (!eredmeny.equals("marad")) {
                     if (eredmeny.equals("jobbra")) {
                         if (b.jobbra_atmehet && b.gazdi == 1 && READY_TO_SAND) {
-                            //System.out.println("farkas kuldes jobbra");
-                            //b.gazdi = 2;
                             int y_hely = (int) b.hely.y;
                             b.stopRunning();
                             try {
@@ -91,15 +78,9 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                                 throw new RuntimeException(e);
                             }
                             remove_f_list.add(b);
-                            //f_list.remove(b);
-                        } else {
-                            //System.out.println("Valami felrement");
                         }
                     } else if (eredmeny.equals("balra")) {
                         if (b.balra_atmehet && b.gazdi == 2 && READY_TO_SAND) {
-                            //System.out.println("farkas kuldes balra");
-                            //b.gazdi = 1;
-                            //palya_kliens.sendObjects(b);
                             int y_hely = (int) b.hely.y;
                             b.stopRunning();
                             try {
@@ -108,9 +89,6 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                                 throw new RuntimeException(e);
                             }
                             remove_f_list.add(b);
-                            //f_list.remove(b);
-                        } else {
-                            //System.out.println("Valami felrement");
                         }
                     }
                 }
@@ -124,7 +102,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                 f_list.remove(b);
             }
         }
-        else{
+        else{  // IF GAME OVER
             // todo megallitani az osszes allat
             // todo osszeszamolni a baranyokat
             // todo elküldeni a Palyanak és ott osszehasonlitani
@@ -150,17 +128,10 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
 
 
 
-    /*public void setLock(Object _lock){
-        lock = _lock;
-    }*/
-
 
     Field(int _playernumber,boolean readyornot,Object _lock) {
         lock = _lock;
         if(_playernumber == 2 ) READY_TO_SAND = true;
-        //this.palya_szerver = palya_szerver1;
-        //this.palya_kliens = palya_kliens1;
-
         playernumber = _playernumber;
 
         game_over = false;
@@ -210,6 +181,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
     private int ennyi_baranyom_van=0;
     @Override
     public void run() {
+        System.out.println("Field fut P"  + playernumber);
         frame.setVisible(true);
         Allatok_inditasa();
 
@@ -288,11 +260,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
 
     // GETTER / SETTER ---------------------------------------------------------------
     // -------------------------------------------------------------------------------
-    public void setReadyToRockAndRoll(boolean _readyToRockAndRoll) {
-        this.readyToRockAndRoll = _readyToRockAndRoll;
-        //System.out.println(readyToRockAndRoll);
-        frame.repaint();
-    }
+
     public ArrayList<Barany> getBaranyok() { return b_list; }
     public ArrayList<Farkas> getFarkasok(){ return f_list;}
     public ArrayList<Falak> getFalak(){ return fal_list; }
@@ -338,21 +306,20 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
 
     // PRIVATE VALTOZOK JATEKHOZ -----------------------------------------------------
     // -------------------------------------------------------------------------------
-    protected ArrayList<Barany> b_list =  new ArrayList<>();
-    protected ArrayList<Farkas> f_list =  new ArrayList<>();
-    protected ArrayList<Falak> fal_list =  new ArrayList<>();
-    protected boolean readyToRockAndRoll;
+    private ArrayList<Barany> b_list =  new ArrayList<>();
+    private ArrayList<Farkas> f_list =  new ArrayList<>();
+    private ArrayList<Falak> fal_list =  new ArrayList<>();
+    private boolean readyToRockAndRoll;
     public static boolean READY_TO_SAND;
-    protected static int max_hanydb_fal = 30;
-    protected  int cur_hanydb_fal;
-    protected static final int palyameret_x = 500;
-    protected static final int palyameret_y = 500;
-    protected JFrame frame = new JFrame();
-    protected int playernumber;
-    protected JLabel label1;
-    protected Field_Panel panel;
+    private static int max_hanydb_fal = 30;
+    private  int cur_hanydb_fal;
+    private static final int palyameret_x = 500;
+    private static final int palyameret_y = 500;
+    private JFrame frame = new JFrame();
+    private int playernumber;
+    private JLabel label1;
+    private Field_Panel panel;
     protected static boolean game_over; // def :  false
-    public static boolean getGame_over() {return game_over;}
     public static void    setGame_over(boolean allitas) { game_over = allitas;}
     // -------------------------------------------------------------------------------
     // -------------------------------------------------------------------------------

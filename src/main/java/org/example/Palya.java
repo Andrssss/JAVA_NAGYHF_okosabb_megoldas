@@ -1,7 +1,5 @@
 package org.example;
 
-import com.sun.media.jfxmedia.events.NewFrameEvent;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -47,55 +45,66 @@ public class Palya implements Runnable{
         }
     }
 
+    private Object Mylock = new Object();
     /**
      * Close socket
      */
     public void close() {
-        try{
+                running = false;
+                if(MyPalya_szerver != null )  MyPalya_szerver.close();
+        try {
             serverSocket.close();
-        }catch (IOException e){
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+
     }
 
-
     public static boolean running = true;
-
+    private Palya_szerver MyPalya_szerver = null;
     /**
      * Parhuzamosan futtathato programresz
      */
     public void run() {
+        System.out.println("Palya fut");
         try {
             serverSocket.setSoTimeout(timeout);
 
-            while (!Thread.currentThread().isInterrupted()) {
+
                 while(running){
-                    if (serverSocket != null) {
+                    System.out.println("Palya fut");
+                        if (serverSocket != null) {
 
-                        // TODO
-                        // EZ AKKOR NYILIK MEG, HA SIKERÜLT A CONNECTION
-                        if(clientSocket == null)  {
-                            //WaitingFrame frame = new WaitingFrame(1);
+                            // TODO
+                            // EZ AKKOR NYILIK MEG, HA SIKERÜLT A CONNECTION
+                            if(clientSocket == null)  {
+                                //WaitingFrame frame = new WaitingFrame(1);
+                            }
+
+
+                            try {
+                                clientSocket = serverSocket.accept(); // itt elfogadja a kérést és nyit egy socketet
+                                MyPalya_szerver = new Palya_szerver(clientSocket,myField,myw1,lock);
+                                new Thread(MyPalya_szerver).run();
+
+                                //new Thread(MyPalya_szerver).run();
+                                //if(!running) break;
+                            } catch (java.net.SocketTimeoutException ste) {
+                                // Itt fut le, ha timeout történik
+                                System.err.println("SERVER       - TIMEOUT");
+                                break; // A fő ciklust leállítjuk a timeout után
+                            } catch (IOException e) {
+                                System.err.println("SERVER       - Failed to communicate with RAKTAR!");
+                            }
                         }
+                        else{
+                            System.err.println("SERVER       - Server socket is not empty");
 
-
-                        try {
-                            clientSocket = serverSocket.accept(); // itt elfogadja a kérést és nyit egy socketet
-                            new Palya_szerver(clientSocket,myField,myw1,lock).run();
-
-                        } catch (java.net.SocketTimeoutException ste) {
-                            // Itt fut le, ha timeout történik
-                            System.out.println("SERVER       - TIMEOUT");
-                            break; // A fő ciklust leállítjuk a timeout után
-                        } catch (IOException e) {
-                            System.err.println("SERVER       - Failed to communicate with RAKTAR!");
-                        }
                     }
-                    else{
-                        System.out.println("SERVER       - Server socket is not empty");
-                    }
+
                 }
-            }
+
+
         } catch (SocketException e) {
             throw new RuntimeException(e);
         }

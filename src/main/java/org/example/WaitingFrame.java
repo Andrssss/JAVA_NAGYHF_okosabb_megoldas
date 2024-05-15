@@ -17,10 +17,11 @@ public class WaitingFrame extends JFrame implements ActionListener {
     static String messege = " ";
     private static Field f1;
     // nem fasza, hiba forras
+    Palya MyPalya = null;
+    Object _lock2= new Object();
+    Object _lock= new Object();
 
-    public static void setMessege(String mess){
-        messege = mess;
-    }
+
 
 
 
@@ -91,13 +92,24 @@ public class WaitingFrame extends JFrame implements ActionListener {
             new ChangePortFrame(playernumber);
         }
         else if(e.getSource()==button3){
-
+            if(MyPalya != null) MyPalya.close();
             frame.dispose();
         }
     }
 
 
-    Object _lock= new Object();
+
+
+    public static void setMessege(String mess){
+        messege = mess;
+    }
+    public void kapcsolat_indul(){
+        frame.dispose();
+    }
+    public void close(){
+        frame.dispose();
+    }
+
     private void KLIENS_PROBAL_CSATLAKOZNI() {
         Field f2 = new Field(2,true,_lock);
         //Palya_kliens kliens = new Palya_kliens("localhost",f2);
@@ -113,26 +125,19 @@ public class WaitingFrame extends JFrame implements ActionListener {
             reconnect();
         }
     }
-
     public void reconnect(){
         System.err.println("Nem sikerult csatlakozni a szerverhez.");
         button1.setText("Reconnect");
         label2.setText("Erros cant connect");
     }
-
-
-    Object _lock2= new Object();
-    public void kapcsolat_indul(){
-        frame.dispose();
-    }
-    boolean csukd_be= true;
     private void SZERVER_INDUL() throws InterruptedException {
 
         f1 = new Field(1,true,_lock2);
 
         // todo    CSAK ELSORE
         // todo
-        new Thread(new Palya(f1,this,_lock2)).start();
+        MyPalya = new Palya(f1,this,_lock2);
+        new Thread(MyPalya).start();
         // todo
         // todo
 

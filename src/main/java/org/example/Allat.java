@@ -31,7 +31,7 @@ public abstract class Allat implements Runnable {
             // todo ----------
             // todo ----------
             if((Math.abs(ujX - f.hely.x-5)<5)  && (Math.abs(ujY - f.hely.y-5)<5 )) x_fal_utkozes = true;
-            if((Math.abs(ujX - f.hely.x+5)>5)  && (Math.abs(ujY - f.hely.y-5)<5 )) x_fal_utkozes = true;
+            if((Math.abs(ujX - f.hely.x+5)<5)  && (Math.abs(ujY - f.hely.y-5)<5 )) x_fal_utkozes = true;
             //if(ujX < f.hely.x+5 && (Math.abs(ujY - f.hely.y-5)<5 )) x_fal_utkozes = true;
             // todo ----------
             // todo ----------

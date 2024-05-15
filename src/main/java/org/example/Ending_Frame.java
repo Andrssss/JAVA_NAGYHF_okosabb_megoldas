@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 
 public class Ending_Frame extends JFrame implements ActionListener {
     protected Label label1;
-    protected Label label2;
     protected JButton button1;
     protected JButton button2;
     protected JFrame frame = new JFrame();
