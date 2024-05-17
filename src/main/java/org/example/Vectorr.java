@@ -82,7 +82,4 @@ public class Vectorr {
             return new Vectorr(0, 0);
         }
     }
-
-
-
 }

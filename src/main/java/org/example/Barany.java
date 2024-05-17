@@ -8,15 +8,15 @@ public class Barany extends Allat implements Runnable{
     @Override
     public void run() {
         // TODO -------------------------
-        //System.out.println("Barany fut");
-        while (running) {
+        /*while (running) {
+            System.out.println("Barany fut");
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
 
-        }
+        }*/
 
 
         //randomMozgas();

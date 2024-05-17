@@ -3,23 +3,20 @@ package org.example;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.*;
 
 public class WaitingFrame extends JFrame implements ActionListener {
-    protected Label label1;
-    protected Label label2;
-    protected JButton button1;
-    protected JButton button2;
-    protected JButton button3;
-    protected JFrame frame = new JFrame();
-    protected int playernumber;
-    static String messege = " ";
-    private static Field f1;
-    // nem fasza, hiba forras
-    Palya MyPalya = null;
-    Object _lock2= new Object();
-    Object _lock= new Object();
+    private Label label1;
+    private final Label label2;
+    private JButton button1;
+    private final JButton button2;
+    private final JButton button3;
+    private final JFrame frame = new JFrame();
+    private final int playernumber;
+    private static String messege = " ";
+    private Palya MyPalya = null;
+
+
 
 
 
@@ -65,9 +62,54 @@ public class WaitingFrame extends JFrame implements ActionListener {
     }
 
 
+
+
+
+
+
+    public static void setMessege(String mess){  messege = mess;  }
+    public void close(){  frame.dispose();  }
+
+
+
+
+
+    private void KLIENS_PROBAL_CSATLAKOZNI() {
+        Object _lock= new Object();
+        Palya_kliens p1 = new Palya_kliens("localhost",_lock);
+        Thread t1 = new Thread(p1);
+        if(messege.equals("success")){
+            t1.start();
+            frame.dispose();
+        }else{
+            reconnect();
+        }
+    }
+    public void reconnect(){
+        System.err.println("Nem sikerult csatlakozni a szerverhez.");
+        button1.setText("Reconnect");
+        label2.setText("Erros cant connect");
+    }
+
+
+
+
+
+    private void SZERVER_INDUL() throws InterruptedException {
+        Object _lock2= new Object();
+        MyPalya = new Palya(this,_lock2);
+        new Thread(MyPalya).start();
+
+        // WAITING -------------------------
+            button1.setVisible(false);
+            button2.setVisible(false);
+            label2.setVisible(false);
+            label1.setText("Waiting for Player2");
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        // EZ A CSATLAKOZO GOMB
+        // EZ A CSATLAKOZO GOMB ------------------------------------------
         if(e.getSource()==button1){
             switch (playernumber) {
                 case 1:
@@ -81,80 +123,18 @@ public class WaitingFrame extends JFrame implements ActionListener {
                     System.out.println("Valami felre ment");
             }
         }
-        // EZ A IP / PORT VALTOZTATO GOMB
+        // EZ A IP / PORT VALTOZTATO GOMB  -------------------------------
         else if(e.getSource()==button2){
             frame.dispose();
             new ChangePortFrame(playernumber);
         }
+        // EZ PEDIG AZ EXIT ----------------------------------------------
         else if(e.getSource()==button3){
             if(MyPalya != null) {
                 MyPalya.close();
             }
-
-
             Palya.running = false;
-
-
             frame.dispose();
         }
     }
-
-
-
-
-    public static void setMessege(String mess){
-        messege = mess;
-    }
-    public void kapcsolat_indul(){
-        frame.dispose();
-    }
-    public void close(){
-        frame.dispose();
-    }
-
-
-
-    private void KLIENS_PROBAL_CSATLAKOZNI() {
-        Field f2 = new Field(2,true,_lock);
-        //Palya_kliens kliens = new Palya_kliens("localhost",f2);
-        Thread t1 = new Thread(new Palya_kliens("localhost",f2,_lock));
-        if(messege.equals("success")){
-            // HA EZT ITT NEM TESZED MEG, AKKOR 1 SZÁLUNK FUT EZ MEG A KLIENS MEG A FIELD XDDD
-            // JAVA EZ MI A FASZOM, LEHET ÉN VAGYOK A BUTA DE FÉL KURVA NAPOM ELMENT EZZEL
-            t1.start();
-            // new Thread(new Palya_kliens("localhost",f2)).start();
-            //f2.run();
-            frame.dispose();
-        }else{
-            reconnect();
-        }
-    }
-    public void reconnect(){
-        System.err.println("Nem sikerult csatlakozni a szerverhez.");
-        button1.setText("Reconnect");
-        label2.setText("Erros cant connect");
-    }
-    private void SZERVER_INDUL() throws InterruptedException {
-        //f1 = new Field(1,true,_lock2);
-
-
-        // todo    CSAK ELSORE
-        // todo
-        MyPalya = new Palya(this,_lock2);
-        new Thread(MyPalya).start();
-        // todo
-        // todo
-
-        // WAITING -------------------------
-            button1.setVisible(false);
-            button2.setVisible(false);
-            // button3.setVisible(false);
-            label2.setVisible(false);
-            label1.setText("Waiting for Player2");
-
-
-
-    }
-
-
 }

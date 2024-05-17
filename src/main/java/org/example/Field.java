@@ -1,5 +1,4 @@
 package org.example;
-
 import javax.swing.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -7,28 +6,138 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public final class Field  extends JFrame  implements MouseListener, Runnable {
+    Field(int _playernumber,boolean readyornot,Object _lock) {
+        lock = _lock;
+        if(_playernumber == 2 ) READY_TO_SAND = true;
+        playernumber = _playernumber;
+        game_over = false;
+        cur_hanydb_fal=0;
+        readyToRockAndRoll = readyornot;
+
+        panel = new Field_Panel(this); // todo , ez itt indit egy szalat WTF
+        frame.add(panel);               // TODO
+        frame.setTitle("PLAYER -  " + playernumber + " - FIELD");
+
+        frame.addMouseListener(this);
+        frame.pack();
+        if(playernumber ==1) frame.setLocation(100, 100);
+        if(playernumber ==2) frame.setLocation(700, 100);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(null);
+    }
+
+
+
+    @Override
+    public void run() {
+        System.out.println("Field fut P"  + playernumber);
+        panel.start();
+
+        frame.setVisible(true);
+        Allatok_inditasa();
+
+        boolean running = true;
+        while(running){
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            if(game_over){
+                synchronized (lock){
+                    for(Barany b : b_list){
+                        ennyi_baranyom_van++;
+                    }
+                    for(Farkas b : f_list){
+                        b.stopRunning();
+                    }
+                    for(Barany b : b_list){
+                        b.stopRunning();
+                    }
+
+                    if(playernumber == 1) Palya_szerver.ennyi_baranyod_van(ennyi_baranyom_van);
+                    if(playernumber == 2) Palya_kliens.ennyi_baranyod_van(ennyi_baranyom_van);
+                    lock.notify();
+                    //System.out.println("Player" +playernumber +" - "+ ennyi_baranyom_van);
+                    frame.dispose();
+                }
+                running = false;
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // ------------------------------ FÜGGVENYEK  ------------------------------------
+    // -------------------------------------------------------------------------------
+    private void Allatok_inditasa(){
+        if(readyToRockAndRoll) {
+            int farkaso_szama = 3;
+            int baranyok_szama = 3;
+
+            for (int i = 0; i < baranyok_szama; i++) {
+                Barany barany = new Barany();
+                barany.setGazdi(playernumber);
+                b_list.add(barany); // Add Baranyok object to the list
+
+                Thread thread = new Thread(barany);
+                thread.setName("Barany" + (i + 1)); // Set unique thread names
+                thread.start();
+
+            }
+            for (int i = 0; i < farkaso_szama; i++) {
+                Farkas f = new Farkas();
+                f.setGazdi(playernumber);
+                f_list.add(f); // Add Baranyok object to the list
+
+                Thread thread = new Thread(f);
+                thread.setName("Farkas" + (i + 1)); // Set unique thread names
+                thread.start();
+            }
+        }
+    }
     public void addBarany(int x,int y){
-        //System.out.println("Barany - y : " + number+ " Player" + playernumber);
+        System.out.println("Barany - y : " + " Player" + playernumber);
         Barany b = new Barany(x,y);
         b.setGazdi(playernumber);
         b_list.add(b);
         //b.run(); EZ úgy megszopatott, de úgy .... Már negyedjére XDDDD
         //  szerintem egy teljes napom elment rá.... A tudás hatalom gyermekem
-        new Thread(b).start();
+        if(game_over){System.err.println("Barany nem indul, mert game over");}
+        else{
+            new Thread(b).start();
+        }
     }
-
     public void addFarkas(int x,int y){
-        //System.out.println("Farkas - y : " + number + " Player" + playernumber);
+        System.out.println("Farkas - y : " + " Player" + playernumber);
         Farkas f = new Farkas(x, y);
         f.setGazdi(playernumber);
         f_list.add(f);
         //f.run();
-        new Thread(f).start();
+        if(game_over){System.err.println("Farkas nem indul, mert game over");}
+        else{
+            new Thread(f).start();
+        }
     }
-
-
-    Object lock;
-
     public void AllatokMozog(){
         if(!game_over) {
             ArrayList<Barany> remove_b_list = new ArrayList<>();
@@ -109,162 +218,14 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
             //
         }
     }
+    // -------------------------------------------------------------------------------
+    // -------------------------------------------------------------------------------
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    Field(int _playernumber,boolean readyornot,Object _lock) {
-        lock = _lock;
-        if(_playernumber == 2 ) READY_TO_SAND = true;
-        playernumber = _playernumber;
-
-        game_over = false;
-        cur_hanydb_fal=0;
-        readyToRockAndRoll = readyornot;
-
-        //label1 = new JLabel(String.valueOf(readyToRockAndRoll));
-        //label1.setBounds(100,60,150,15);
-
-
-
-        panel = new Field_Panel(this); // todo , ez itt indit egy szalat WTF
-        frame.add(panel);  // TODO
-
-
-        frame.setTitle("PLAYER -  " + playernumber + " - FIELD");
-
-        frame.addMouseListener(this);
-        frame.pack();
-        if(playernumber ==1) frame.setLocation(100, 100);
-        if(playernumber ==2) frame.setLocation(700, 100);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(null);
-
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    private int ennyi_baranyom_van=0;
-    @Override
-    public void run() {
-        System.out.println("Field fut P"  + playernumber);
-        panel.start();
-
-        frame.setVisible(true);
-        //Allatok_inditasa();
-
-        boolean running = true;
-        while(running){
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            if(game_over){
-                synchronized (lock){
-                    for(Barany b : b_list){
-                        ennyi_baranyom_van++;
-                    }
-                    for(Farkas b : f_list){
-                        b.stopRunning();
-                    }
-                    for(Barany b : b_list){
-                        b.stopRunning();
-                    }
-
-                    if(playernumber == 1) Palya_szerver.ennyi_baranyod_van(ennyi_baranyom_van);
-                    if(playernumber == 2) Palya_kliens.ennyi_baranyod_van(ennyi_baranyom_van);
-                    lock.notify();
-                    //System.out.println("Player" +playernumber +" - "+ ennyi_baranyom_van);
-                    frame.dispose();
-
-                }
-
-
-                //
-                // todo --------------------------------
-                // todo -------END SCREEN NYITÁS -------
-                // todo --------------------------------
-                // mouse listenert kilőni
-                // vissza küldeni, hogy hány bárányom van
-                // aztán végeredmény kijelzo
-                // de azt lehet Palya szerveren
-                running = false;
-            }
-        }
-
-
-    }
-
-    private void Allatok_inditasa(){
-        if(readyToRockAndRoll) {
-            int farkaso_szama = 3;
-            int baranyok_szama = 3;
-
-            for (int i = 0; i < baranyok_szama; i++) {
-                Barany barany = new Barany();
-                barany.setGazdi(playernumber);
-                b_list.add(barany); // Add Baranyok object to the list
-
-                Thread thread = new Thread(barany);
-                thread.setName("Barany" + (i + 1)); // Set unique thread names
-                thread.start();
-
-            }
-            for (int i = 0; i < farkaso_szama; i++) {
-                Farkas f = new Farkas();
-                f.setGazdi(playernumber);
-                f_list.add(f); // Add Baranyok object to the list
-
-                Thread thread = new Thread(f);
-                thread.setName("Farkas" + (i + 1)); // Set unique thread names
-                thread.start();
-            }
-        }
-    }
-
-
-
-
-    // GETTER / SETTER ---------------------------------------------------------------
+    // --------------------------  GETTER / SETTER  ----------------------------------
     // -------------------------------------------------------------------------------
 
     public ArrayList<Barany> getBaranyok() { return b_list; }
@@ -272,6 +233,8 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
     public ArrayList<Falak> getFalak(){ return fal_list; }
     public static int getPalyameret_x() {return palyameret_x;}
     public static int getPalyameret_y() {return palyameret_y;}
+    public void    setGame_over(boolean allitas) { this.game_over = allitas;}
+
     // -------------------------------------------------------------------------------
     // -------------------------------------------------------------------------------
 
@@ -280,12 +243,10 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
 
 
 
-    // MOUSE LISTENER ----------------------------------------------------------------
+    // ----------------------------  MOUSE LISTENER  --------------------------------- (FALAK MIATT)
     // -------------------------------------------------------------------------------
-    @Override
-    public void mouseClicked(MouseEvent e) {}
-    @Override
-    public void mousePressed(MouseEvent e) {
+    @Override public void mouseClicked(MouseEvent e) {}
+    @Override public void mousePressed(MouseEvent e) {
         if(!game_over){
             int x = e.getX();
             int y = e.getY();
@@ -297,12 +258,9 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
             }
         }
     }
-    @Override
-    public void mouseReleased(MouseEvent e) {}
-    @Override
-    public void mouseEntered(MouseEvent e) {}
-    @Override
-    public void mouseExited(MouseEvent e) {}
+    @Override public void mouseReleased(MouseEvent e) {}
+    @Override public void mouseEntered(MouseEvent e) {}
+    @Override public void mouseExited(MouseEvent e) {}
     // -------------------------------------------------------------------------------
     // -------------------------------------------------------------------------------
 
@@ -310,7 +268,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
 
 
 
-    // PRIVATE VALTOZOK JATEKHOZ -----------------------------------------------------
+    //  ------------------------  PRIVATE VALTOZOK JATEKHOZ  -------------------------
     // -------------------------------------------------------------------------------
     private ArrayList<Barany> b_list =  new ArrayList<>();
     private ArrayList<Farkas> f_list =  new ArrayList<>();
@@ -319,14 +277,14 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
     public static boolean READY_TO_SAND;
     private static int max_hanydb_fal = 30;
     private  int cur_hanydb_fal;
-    private static final int palyameret_x = 500;
-    private static final int palyameret_y = 500;
+    protected static final int palyameret_x = 500;
+    protected static final int palyameret_y = 500;
     private JFrame frame = new JFrame();
     private int playernumber;
-    private JLabel label1;
     private Field_Panel panel;
-    protected static boolean game_over; // def :  false
-    public static void    setGame_over(boolean allitas) { game_over = allitas;}
+    protected boolean game_over; // def :  false
+    private int ennyi_baranyom_van=0;
+    private Object lock;
     // -------------------------------------------------------------------------------
     // -------------------------------------------------------------------------------
 }

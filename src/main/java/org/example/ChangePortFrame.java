@@ -24,40 +24,34 @@ public class ChangePortFrame extends JFrame implements ActionListener {
         button2.addActionListener(this);
         button3.addActionListener(this);
 
-        // HA nem a szerver
+        // HA nem a szerver, mert neki IP-t valtoztatni
         if(playernumber != 1){
             button1.addActionListener(this);
             textField1.setPreferredSize(new Dimension(250,50));
             textField1.setText(Palya_kliens.getHost());
-            System.out.println(Palya_kliens.getHost());
         }
 
 
         textField2.setPreferredSize(new Dimension(250,50));
 
-        if(playernumber == 1){
-            textField2.setText(Palya.getPORT_NUMBER());
-        } else if(playernumber == 2){
-            textField2.setText(Palya_kliens.getPORT_NUMBER());
-        }
-
-
+        if(playernumber == 1)       {   textField2.setText(Palya.getPORT_NUMBER());         }
+        else if(playernumber != 2)  {  textField2.setText(Palya_kliens.getPORT_NUMBER());   }
 
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500,500);
-
-        setLayout(new GridLayout(1, 2, 10, 10)); // 1 row, 2 columns, 10px horizontal gap, 10px vertical gap
-
+        setLayout(new GridLayout(1, 2, 10, 10));
         frame.setLayout(new FlowLayout());
 
+
         if(playernumber != 1)  frame.add(button1);
-        frame.add(button2);
-        frame.add(button3);
-        if(playernumber != 1)   frame.add(textField1);
-        frame.add(textField2);
+                               frame.add(button2);
+                               frame.add(button3);
+        if(playernumber != 1)  frame.add(textField1);
+                               frame.add(textField2);
 
-
+        if(playernumber ==1) frame.setLocation(200, 200);
+        if(playernumber ==2) frame.setLocation(800, 200);
         frame.setTitle("PLAYER -  " + playernumber);
         frame.pack();
         frame.setVisible(true);
@@ -72,29 +66,23 @@ public class ChangePortFrame extends JFrame implements ActionListener {
             else{
                 Palya_kliens.setHost(textField1.getText());
             }
-
         }
 
         /// ------------------------- BUTTON 2 ------------------------------------
         else if(e.getSource()==button2){
             String input_data = textField2.getText();
-
-
-            if(isInteger(input_data).equals(" ")){
-                textField2.setText("Ez nem valid port");
-            }
+            if(isInteger(input_data).equals(" "))  {  textField2.setText("Ez nem valid port"); }
             else{
                 int number = Integer.parseInt(input_data);
-
                 if(playernumber == 1)       Palya.setPORT_NUMBER(number);
-                else if(playernumber == 2)  Palya_kliens.setPORT_NUMBER(number);
+                else                        Palya_kliens.setPORT_NUMBER(number);
             }
         }
 
         /// ------------------------- BUTTON 3 ------------------------------------
         else if(e.getSource()==button3){
             frame.dispose();
-            WaitingFrame myWindow = new WaitingFrame(playernumber);
+            new WaitingFrame(playernumber);
         }
     }
 

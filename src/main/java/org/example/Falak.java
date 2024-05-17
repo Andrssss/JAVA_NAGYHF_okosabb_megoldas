@@ -3,7 +3,9 @@ package org.example;
 import java.awt.*;
 
 public class Falak extends Allat {
-    int ennyi_maodperce_el;
+    public int ennyi_maodperce_el;
+
+
 
     Falak(int x, int y) { // ide kell létrehozni
         ennyi_maodperce_el=0;
@@ -11,12 +13,5 @@ public class Falak extends Allat {
         hely.x = (x-10) ;
         hely.y = y-30;
         cubeColor = new Color(70,70,70);
-    }
-
-
-
-    @Override
-    void meghal() {
-        super.meghal();
     }
 }

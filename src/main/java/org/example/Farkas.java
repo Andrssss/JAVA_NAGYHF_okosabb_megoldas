@@ -12,14 +12,14 @@ public class Farkas extends Allat implements Runnable {
     @Override
     public void run() {
         // TODO -------------------------
-        //System.out.println("Farkas fut");
-        while (running) {
+        /*while (running) {
+            System.out.println("Farkas fut");
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-        }
+        }*/
     }
 
 

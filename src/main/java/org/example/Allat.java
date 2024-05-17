@@ -5,18 +5,14 @@ import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class Allat implements Runnable {
-    @Override
-    public void run() {
-
-    }
-
+    @Override public void run() {}
 
 
 
 
     public synchronized String randomMozgas(ArrayList<Falak> falak) {
         // Generálunk véletlenszerű irányokat
-        int irany_x =-5;
+        int irany_x =merre_menjenek;
         int irany_y = ThreadLocalRandom.current().nextInt(-1, 2); // -1, 0, vagy 1 lehet az irány
 
         // Beállítjuk az új pozíciót a véletlenszerű irányok alapján
@@ -28,16 +24,9 @@ public abstract class Allat implements Runnable {
         boolean x_fal_utkozes = false;
         boolean y_fal_utkozes = false;
         for(Falak f : falak){
-            // todo ----------
-            // todo ----------
-            if((Math.abs(ujX - f.hely.x-5)<5)  && (Math.abs(ujY - f.hely.y-5)<5 )) x_fal_utkozes = true;
-            if((Math.abs(ujX - f.hely.x+5)<5)  && (Math.abs(ujY - f.hely.y-5)<5 )) x_fal_utkozes = true;
-            //if(ujX < f.hely.x+5 && (Math.abs(ujY - f.hely.y-5)<5 )) x_fal_utkozes = true;
-            // todo ----------
-            // todo ----------
+            if((Math.abs(ujX - f.hely.x-5)<5)) x_fal_utkozes = true;
+            if((Math.abs(ujY - f.hely.y-5)<5)) y_fal_utkozes = true;
         }
-
-
 
 
         // Hogy Y ne mehessen ki a palyarol ---------------------------------------------
@@ -53,7 +42,6 @@ public abstract class Allat implements Runnable {
         if(!jobbra_atmehet && ujX >= Field.getPalyameret_x()-5 ) this.hely.x = Field.getPalyameret_x()-5;
         if(!balra_atmehet && ujX <= 0) this.hely.x = 0;
 
-
         // /JOBBRA, BALRA ÁTMEGY ---------------------------
         if (ujX >= Field.getPalyameret_x() && jobbra_atmehet) {
             this.hely.x = 0;
@@ -65,10 +53,19 @@ public abstract class Allat implements Runnable {
         }
         return "marad";
     }
+
+
+
+
+
     void meghal(){
         eletben_van = false;
         cubeColor =  new Color(0,0,0);
     }
+
+
+
+
     public void setGazdi(int ide){
         this.gazdi = ide;
         switch (ide){
@@ -85,6 +82,12 @@ public abstract class Allat implements Runnable {
 
 
 
+    public static void jobbra(){   merre_menjenek = 5;   }
+    public static void balra(){    merre_menjenek = -5;   }
+
+
+
+    protected static int  merre_menjenek = 1;
     protected Vectorr hely = new Vectorr();
     protected Color cubeColor;
     protected boolean eletben_van;

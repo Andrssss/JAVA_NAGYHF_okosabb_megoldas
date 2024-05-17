@@ -24,9 +24,9 @@ public class Ending_Frame extends JFrame implements ActionListener {
         label1.setBounds(100,60,150,15);
         //label2 = new Label( "ready to connect");
 
-        button1 = new JButton("Retry");
-        button1.setBounds(25,100,200,50);
-        button1.addActionListener(this);
+        //button1 = new JButton("Retry");
+        //button1.setBounds(25,100,200,50);
+        //button1.addActionListener(this);
 
 
         button2 = new JButton("exit");
@@ -41,7 +41,7 @@ public class Ending_Frame extends JFrame implements ActionListener {
         frame.add(label1);
         //frame.add(label2);
 
-        if(playernumber ==1) frame.setLocation(100, 100);
+        //if(playernumber ==1) frame.setLocation(100, 100);
         if(playernumber ==2) frame.setLocation(700, 100);
         frame.setTitle("PLAYER -  " + playernumber);
 
@@ -52,12 +52,12 @@ public class Ending_Frame extends JFrame implements ActionListener {
     }
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource()==button1){
+        /*if(e.getSource()==button1){
             if(playernumber==1) // todo valami  ha szerver, akkor a wárakozás player 2 -re kell
             new WaitingFrame(playernumber);
             Palya.running = false;
             frame.dispose();
-        }
+        }*/
         if(e.getSource()==button2){
             if(playernumber == 1) Palya.running = false;
             if(playernumber == 2) Palya_kliens.running = false;

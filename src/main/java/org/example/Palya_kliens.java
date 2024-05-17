@@ -4,34 +4,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-
 import static java.lang.String.valueOf;
 
 public class Palya_kliens implements Runnable{
-    private static Socket clientSocket;
-    private static int PORT_NUMBER=19999;
-    private static String host="localhost";
-    private static PrintWriter clientWriter;
-    private static final int playernumber = 2;
-    private Object lock;
-    private Field myField=null;
-    private static int baranyaim = -1;
-
-    public static boolean running = true;
-
-    private Thread myField_thread;
-
-
-
-
-
-    /// -------------------   KONSTRUKTOR   ----------------------------------------------------
-    /// ----------------------------------------------------------------------------------------
-    protected Palya_kliens(String host1,Field f1,Object _lock) {
-        myField = f1;
-        //myField.setLock(lock);
+    protected Palya_kliens(String host1,Object _lock) {
         lock = _lock;
+        Field f1 = new Field(2,true ,lock);
+        myField = f1;
         host = host1;
+
+
 
         try{
             clientSocket = new Socket("localhost",PORT_NUMBER);
@@ -40,8 +22,6 @@ public class Palya_kliens implements Runnable{
             System.err.println("fail to connect");
             WaitingFrame.setMessege("fail");
         }
-
-
 
         if (clientSocket != null) {
             System.out.println("KLIENS : CSATLAKOZOTT");
@@ -54,8 +34,6 @@ public class Palya_kliens implements Runnable{
             WaitingFrame.setMessege("fail");
         }
     }
-    /// ----------------------------------------------------------------------------------------
-    /// ----------------------------------------------------------------------------------------
 
 
 
@@ -71,23 +49,6 @@ public class Palya_kliens implements Runnable{
 
 
 
-    /// ------------------- GETTER / SETTER ----------------------------------------------------
-    /// ----------------------------------------------------------------------------------------
-    protected static String getHost() {return host;}
-    protected static void setHost(String host) {Palya_kliens.host = host;  }
-    protected static String getPORT_NUMBER() { return valueOf(PORT_NUMBER);  }
-    protected static void setPORT_NUMBER(int newport) { PORT_NUMBER = newport;  }
-    protected static void ennyi_baranyod_van(int ennyi_baranyom_van){
-        baranyaim = ennyi_baranyom_van;
-        try {
-            sendLine("game_over"+baranyaim);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    protected void close() throws IOException {clientSocket.close();  myField.setGame_over(true);}
-    /// ----------------------------------------------------------------------------------------
-    /// ----------------------------------------------------------------------------------------
 
 
 
@@ -97,7 +58,6 @@ public class Palya_kliens implements Runnable{
 
     /// --------------------------------       RUN     -----------------------------------------
     /// ----------------------------------------------------------------------------------------
-
     public void run() {
 
         System.out.println("Kliens socket : "+ clientSocket.getPort()+ " " + PORT_NUMBER );
@@ -120,7 +80,7 @@ public class Palya_kliens implements Runnable{
                         synchronized (lock){
                             lock.wait(100);
                             new Ending_Frame(baranyaim,masik_baranyai,playernumber);
-                            System.out.println("KLIENS : ÉnBaranyaim-"+  baranyaim + "  KliensBaranyai-"+masik_baranyai);
+                            System.out.println("KLIENS : ÉnBaranyaim-  "+  baranyaim + "  KliensBaranyai-  "+masik_baranyai);
                         }
                         break;
                         //  todo --- itt nem szabad bezárni
@@ -151,8 +111,6 @@ public class Palya_kliens implements Runnable{
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-
-
             try {
                 clientSocket.close();
                 System.out.println("PLAYER2       - CLOSE SOKET: " + clientSocket.getPort());
@@ -170,22 +128,45 @@ public class Palya_kliens implements Runnable{
 
 
 
+    /// ------------------- GETTER / SETTER ----------------------------------------------------
+    /// ----------------------------------------------------------------------------------------
+    protected static String getHost() {return host;}
+    protected static void setHost(String host) {Palya_kliens.host = host;  }
+    protected static String getPORT_NUMBER() { return valueOf(PORT_NUMBER);  }
+    protected static void setPORT_NUMBER(int newport) { PORT_NUMBER = newport;  }
+    protected void close() throws IOException {clientSocket.close();  myField.setGame_over(true); running= false;}
+    // todo ------------
+    // todo ------------
+    // todo ------------
+    // todo ------------
+    // todo ------------
+    /// ----------------------------------------------------------------------------------------
+    /// ----------------------------------------------------------------------------------------
+
 
 
 
     /// ---------------------------- PRIVATE FUGGVENYEK  ---------------------------------------
     /// ----------------------------------------------------------------------------------------
     private int convert_StringMessege_to_int(String kapott_allat){
-            String remainingText = kapott_allat.substring(9);
-            int number=0;
-            try {
-                number = Integer.valueOf(remainingText);
+        String remainingText = kapott_allat.substring(9);
+        int number=0;
+        try {
+            number = Integer.valueOf(remainingText);
 
-            } catch (NumberFormatException e) {
-                System.err.println("Invalid integer input");
-            }
-            System.out.println("Kliens :  szerver baranyai : " + number);
-            return number;
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid integer input");
+        }
+        System.out.println("Kliens :  szerver baranyai : " + number);
+        return number;
+    }
+    protected static void ennyi_baranyod_van(int ennyi_baranyom_van){
+        baranyaim = ennyi_baranyom_van;
+        try {
+            sendLine("game_over"+baranyaim);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     protected static void sendLine(String line) throws IOException {
         System.out.println("Kliens send : "+ line + " to : " +clientSocket.getInetAddress()+" : "+ PORT_NUMBER);
@@ -196,7 +177,20 @@ public class Palya_kliens implements Runnable{
     /// ----------------------------------------------------------------------------------------
 
 
-
+    //  ------------------------  PRIVATE VALTOZOK JATEKHOZ  -------------------------
+    // -------------------------------------------------------------------------------
+    private static Socket clientSocket;
+    private static int PORT_NUMBER=19999;
+    private static String host="localhost";
+    private static PrintWriter clientWriter;
+    private static final int playernumber = 2;
+    private Object lock;
+    private Field myField=null;
+    private static int baranyaim = -1;
+    public static boolean running = true;
+    private Thread myField_thread;
+    // -------------------------------------------------------------------------------
+    // -------------------------------------------------------------------------------
 
 
 

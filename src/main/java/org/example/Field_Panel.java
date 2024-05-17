@@ -7,16 +7,28 @@ import java.util.ArrayList;
 
 
 public class Field_Panel extends JPanel implements ActionListener {
+    Field_Panel(Field field){
+
+        ennyi_ideje_megy_a_game = 0;
+        myfield = field;
+        this.setPreferredSize(new Dimension(Field.palyameret_x,Field.palyameret_y));
+        this.setBackground(Color.green);
+
+
+        //timer.start(); // ez itt nem sexy
+    }
+
+
+
+
     protected static Color palya_szine = new Color(0, 128, 60);
-    protected static final int palyameret_x = 500;
-    protected static final int palyameret_y = 500;
-    public ArrayList<Barany> baranyok = new ArrayList<>();
-    public ArrayList<Farkas> farkasok= new ArrayList<>();
-    public ArrayList<Falak> falak = new ArrayList<>();
-    Timer timer;
-    Field myfield;
+    private ArrayList<Barany> baranyok = new ArrayList<>();
+    private ArrayList<Farkas> farkasok= new ArrayList<>();
+    private ArrayList<Falak> falak = new ArrayList<>();
+    private Timer timer;
+    private Field myfield;
     private int ennyi_ideje_megy_a_game;
-    private final int Ennyi_ideig_van_jatek=  30; // 10mp
+    private final int Ennyi_ideig_van_jatek =  50; // 50mp
     private final int falak_meghalasi_ideje = 30; // 3mp
 
     public void start(){
@@ -25,16 +37,7 @@ public class Field_Panel extends JPanel implements ActionListener {
     }
 
 
-    Field_Panel(Field field){
 
-        ennyi_ideje_megy_a_game = 0;
-        myfield = field;
-        this.setPreferredSize(new Dimension(palyameret_x,palyameret_y));
-        this.setBackground(Color.green);
-
-
-        //timer.start(); // ez itt nem sexy
-    }
 
 
 
@@ -55,7 +58,7 @@ public class Field_Panel extends JPanel implements ActionListener {
 
         if(ennyi_ideje_megy_a_game>Ennyi_ideig_van_jatek) {
             //g2d.drawString("GAME OVER",100,100);
-            Field.setGame_over(true);
+            myfield.setGame_over(true);
         }
 
         //String s = "Time: " + String.format("%02d:%02d", minutes, seconds);
@@ -64,12 +67,12 @@ public class Field_Panel extends JPanel implements ActionListener {
         // --------------------- BARANYOK ------------------------------------
         if(!baranyok.isEmpty()) g2d.setColor(baranyok.getFirst().cubeColor);
         for (Barany b : baranyok) {
-                g2d.fillRect((int) b.hely.x, (int) b.hely.y, 5, 5);
+            g2d.fillRect((int) b.hely.x, (int) b.hely.y, 5, 5);
         }
         // --------------------- FARKASOK  ------------------------------------
         if(!farkasok.isEmpty()) g2d.setColor(farkasok.getFirst().cubeColor);
         for (Farkas b : farkasok) {
-                g2d.fillRect((int) b.hely.x, (int) b.hely.y, 5, 5);
+            g2d.fillRect((int) b.hely.x, (int) b.hely.y, 5, 5);
         }
         // --------------------- FALAK ------------------------------------
         if(!falak.isEmpty()) g2d.setColor(falak.getFirst().cubeColor);
@@ -78,7 +81,7 @@ public class Field_Panel extends JPanel implements ActionListener {
             if(f.ennyi_maodperce_el>=falak_meghalasi_ideje){
                 falak_amiket_ki_kell_torolni.add(f);
             }
-                g2d.fillRect((int) f.hely.x, (int) f.hely.y, 5, 5);
+            g2d.fillRect((int) f.hely.x, (int) f.hely.y, 5, 5);
             f.ennyi_maodperce_el++;
         }
         for (Falak f: falak_amiket_ki_kell_torolni){
@@ -98,7 +101,7 @@ public class Field_Panel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) { // ez fog másodpercenként
-        if(!Field.game_over){
+        if(!myfield.game_over){
             myfield.AllatokMozog();
 
             // ITT KELL A MOZGAST MEGVALOSITANI - VAGY NEM TUDOM
