@@ -14,7 +14,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
         cur_hanydb_fal=0;
         readyToRockAndRoll = readyornot;
 
-        panel = new Field_Panel(this); // todo , ez itt indit egy szalat WTF
+        panel = new Field_Panel(this,barany_monitor,farkas_monitor,falak_monitor); // todo , ez itt indit egy szalat WTF
         frame.add(panel);               // TODO
         frame.setTitle("PLAYER -  " + playernumber + " - FIELD");
 
@@ -34,7 +34,10 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
         panel.start();
 
         frame.setVisible(true);
-        Allatok_inditasa();
+        synchronized (lock){
+            Allatok_inditasa();
+        }
+
 
         boolean running = true;
         while(running){
@@ -89,37 +92,60 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
 
     // ------------------------------ FÜGGVENYEK  ------------------------------------
     // -------------------------------------------------------------------------------
-    private void Allatok_inditasa(){
-        if(readyToRockAndRoll) {
-            int farkaso_szama = 3;
-            int baranyok_szama = 3;
-
-            for (int i = 0; i < baranyok_szama; i++) {
-                Barany barany = new Barany();
-                barany.setGazdi(playernumber);
-                b_list.add(barany); // Add Baranyok object to the list
-
-                Thread thread = new Thread(barany);
-                thread.setName("Barany" + (i + 1)); // Set unique thread names
-                thread.start();
-
+    public void OsztMeghaltal_e(){
+        ArrayList<Barany> remove_b_list = new ArrayList<>();
+        synchronized (farkas_monitor){
+            for(Farkas f : f_list){
+                synchronized (barany_monitor){
+                    for(Barany b : b_list){
+                        if((Math.abs(f.hely.x - b.hely.x-5)<4)&&(Math.abs(f.hely.y - b.hely.y-5)<4)) {
+                            b.meghal();
+                            remove_b_list.add(b);
+                        }
+                    }
+                }
             }
-            for (int i = 0; i < farkaso_szama; i++) {
-                Farkas f = new Farkas();
-                f.setGazdi(playernumber);
-                f_list.add(f); // Add Baranyok object to the list
 
-                Thread thread = new Thread(f);
-                thread.setName("Farkas" + (i + 1)); // Set unique thread names
-                thread.start();
+            for (Barany b : remove_b_list) {
+                b_list.remove(b);
             }
         }
     }
+
+
+    private void Allatok_inditasa(){
+        synchronized (lock){
+                if(readyToRockAndRoll) {
+                    int farkaso_szama = 30;
+                    int baranyok_szama = 30;
+                    for (int i = 0; i < baranyok_szama; i++) {
+                        Barany barany = new Barany();
+                        barany.setGazdi(playernumber);
+                        b_list.add(barany); // Add Baranyok object to the list
+
+                        Thread thread = new Thread(barany);
+                        thread.setName("Barany" + (i + 1)); // Set unique thread names
+                        thread.start();
+
+                    }
+                    for (int i = 0; i < farkaso_szama; i++) {
+                        Farkas f = new Farkas();
+                        f.setGazdi(playernumber);
+                        f_list.add(f); // Add Baranyok object to the list
+
+                        Thread thread = new Thread(f);
+                        thread.setName("Farkas" + (i + 1)); // Set unique thread names
+                        thread.start();
+                    }
+                }
+        }
+    }
+
     public void addBarany(int x,int y){
         System.out.println("Barany - y : " + " Player" + playernumber);
         Barany b = new Barany(x,y);
         b.setGazdi(playernumber);
-        b_list.add(b);
+        synchronized (barany_monitor) {  b_list.add(b);  }
         //b.run(); EZ úgy megszopatott, de úgy .... Már negyedjére XDDDD
         //  szerintem egy teljes napom elment rá.... A tudás hatalom gyermekem
         if(game_over){System.err.println("Barany nem indul, mert game over");}
@@ -127,88 +153,98 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
             new Thread(b).start();
         }
     }
+
     public void addFarkas(int x,int y){
         System.out.println("Farkas - y : " + " Player" + playernumber);
         Farkas f = new Farkas(x, y);
         f.setGazdi(playernumber);
-        f_list.add(f);
+        synchronized (farkas_monitor){  f_list.add(f);  }
         //f.run();
         if(game_over){System.err.println("Farkas nem indul, mert game over");}
         else{
             new Thread(f).start();
         }
     }
+
     public void AllatokMozog(){
         if(!game_over) {
             ArrayList<Barany> remove_b_list = new ArrayList<>();
             ArrayList<Farkas> remove_f_list = new ArrayList<>();
 
-            for (Barany b : b_list) {
-                String eredmeny = b.randomMozgas(fal_list);
+            synchronized (barany_monitor){
+                for (Barany b : b_list) {
+                    String eredmeny = b.randomMozgas(fal_list,falak_monitor);
 
-                if (!eredmeny.equals("marad")) {
-                    if (eredmeny.equals("jobbra")) {
-                        if (b.jobbra_atmehet && b.gazdi == 1 && READY_TO_SAND) {
-                            int y_hely = (int) b.hely.y;
-                            b.stopRunning();
+                    if (!eredmeny.equals("marad")) {
+                        if (eredmeny.equals("jobbra")) {
+                            if (b.jobbra_atmehet && b.gazdi == 1 && READY_TO_SAND) {
+                                int y_hely = (int) b.hely.y;
+                                b.stopRunning();
 
-                            try {
-                                Palya_szerver.sendLine("Barany "+ 0 +" "+ y_hely);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
+                                try {
+                                    Palya_szerver.sendLine("Barany "+ 0 +" "+ y_hely);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                                remove_b_list.add(b);
                             }
-                            remove_b_list.add(b);
-                        }
-                    } else if (eredmeny.equals("balra")) {
-                        if (b.balra_atmehet && b.gazdi == 2 && READY_TO_SAND) {
-                            int y_hely = (int) b.hely.y;
-                            b.stopRunning();
-                            try {
-                                Palya_kliens.sendLine("Barany "+ (palyameret_y-5) +" "+ y_hely);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
+                        } else if (eredmeny.equals("balra")) {
+                            if (b.balra_atmehet && b.gazdi == 2 && READY_TO_SAND) {
+                                int y_hely = (int) b.hely.y;
+                                b.stopRunning();
+                                try {
+                                    Palya_kliens.sendLine("Barany "+ (palyameret_y-5) +" "+ y_hely);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                                remove_b_list.add(b);
                             }
-                            remove_b_list.add(b);
-                        }
-                    }
-                }
-            }
-            for (Farkas b : f_list) {
-                String eredmeny = b.randomMozgas(fal_list);
-
-                if (!eredmeny.equals("marad")) {
-                    if (eredmeny.equals("jobbra")) {
-                        if (b.jobbra_atmehet && b.gazdi == 1 && READY_TO_SAND) {
-                            int y_hely = (int) b.hely.y;
-                            b.stopRunning();
-                            try {
-                                Palya_szerver.sendLine("Farkas "+ 0 +" "+ y_hely);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                            remove_f_list.add(b);
-                        }
-                    } else if (eredmeny.equals("balra")) {
-                        if (b.balra_atmehet && b.gazdi == 2 && READY_TO_SAND) {
-                            int y_hely = (int) b.hely.y;
-                            b.stopRunning();
-                            try {
-                                Palya_kliens.sendLine("Farkas "+ (palyameret_y-5) +" "+ y_hely);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                            remove_f_list.add(b);
                         }
                     }
                 }
             }
 
+            synchronized (farkas_monitor) {
+                for (Farkas b : f_list) {
+                    String eredmeny = b.randomMozgas_Farkas(fal_list,f_list,farkas_monitor,falak_monitor);
 
-            for (Barany b : remove_b_list) {
-                b_list.remove(b);
+                    if (!eredmeny.equals("marad")) {
+                        if (eredmeny.equals("jobbra")) {
+                            if (b.jobbra_atmehet && b.gazdi == 1 && READY_TO_SAND) {
+                                int y_hely = (int) b.hely.y;
+                                b.stopRunning();
+                                try {
+                                    Palya_szerver.sendLine("Farkas " + 0 + " " + y_hely);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                                remove_f_list.add(b);
+                            }
+                        } else if (eredmeny.equals("balra")) {
+                            if (b.balra_atmehet && b.gazdi == 2 && READY_TO_SAND) {
+                                int y_hely = (int) b.hely.y;
+                                b.stopRunning();
+                                try {
+                                    Palya_kliens.sendLine("Farkas " + (palyameret_y - 5) + " " + y_hely);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                                remove_f_list.add(b);
+                            }
+                        }
+                    }
+                }
             }
-            for (Farkas b : remove_f_list) {
-                f_list.remove(b);
+
+            synchronized (barany_monitor) {
+                for (Barany b : remove_b_list) {
+                    b_list.remove(b);
+                }
+            }
+            synchronized (farkas_monitor) {
+                for (Farkas b : remove_f_list) {
+                    f_list.remove(b);
+                }
             }
         }
         else{  // IF GAME OVER
@@ -251,8 +287,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
             int x = e.getX();
             int y = e.getY();
 
-            if(cur_hanydb_fal<max_hanydb_fal){
-                cur_hanydb_fal++;
+            if(fal_list.size()<max_hanydb_fal){
                 Falak f1 = new Falak(x,y);
                 fal_list.add(f1);
             }
@@ -273,6 +308,10 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
     private ArrayList<Barany> b_list =  new ArrayList<>();
     private ArrayList<Farkas> f_list =  new ArrayList<>();
     private ArrayList<Falak> fal_list =  new ArrayList<>();
+    private Object farkas_monitor = new Object();
+    private Object barany_monitor = new Object();
+    private Object falak_monitor = new Object();
+    private Object halottak_monitor = new Object();
     private boolean readyToRockAndRoll;
     public static boolean READY_TO_SAND;
     private static int max_hanydb_fal = 30;

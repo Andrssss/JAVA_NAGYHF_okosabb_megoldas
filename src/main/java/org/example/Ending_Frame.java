@@ -20,8 +20,8 @@ public class Ending_Frame extends JFrame implements ActionListener {
         else                                 szoveg = "Egual";
 
         playernumber = _playernumber;
-        label1 = new Label( "You are the : " + szoveg);
-        label1.setBounds(100,60,150,15);
+        label1 = new Label( "You are the : " + szoveg + "( Mine : " + en_baranyaim + "  Her : " + masik_baranyai+" )");
+        label1.setBounds(100,60,250,15);
         //label2 = new Label( "ready to connect");
 
         //button1 = new JButton("Retry");

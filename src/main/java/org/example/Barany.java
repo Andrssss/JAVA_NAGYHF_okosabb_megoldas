@@ -8,24 +8,22 @@ public class Barany extends Allat implements Runnable{
     @Override
     public void run() {
         // TODO -------------------------
-        /*while (running) {
-            System.out.println("Barany fut");
+        while (running) {
+            //System.out.println("Barany fut");
             try {
-                Thread.sleep(10000);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
 
-        }*/
+        }
 
 
         //randomMozgas();
     }
 
 
-    public void stopRunning() {
-        this.running = false; // Set the running flag to false to stop the thread
-    }
+    public void stopRunning() {this.running = false; }
 
 
 
@@ -51,6 +49,6 @@ public class Barany extends Allat implements Runnable{
 
     @Override
     void meghal() {
-        super.meghal();
+        stopRunning();
     }
 }

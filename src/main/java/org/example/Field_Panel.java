@@ -7,7 +7,10 @@ import java.util.ArrayList;
 
 
 public class Field_Panel extends JPanel implements ActionListener {
-    Field_Panel(Field field){
+    Field_Panel(Field field,Object _barany_monitor,Object _farkas_monitor,Object _falak_monitor){
+        barany_monitor = _barany_monitor;
+        farkas_monitor = _farkas_monitor;
+        falak_monitor = _falak_monitor;
 
         ennyi_ideje_megy_a_game = 0;
         myfield = field;
@@ -25,10 +28,14 @@ public class Field_Panel extends JPanel implements ActionListener {
     private ArrayList<Barany> baranyok = new ArrayList<>();
     private ArrayList<Farkas> farkasok= new ArrayList<>();
     private ArrayList<Falak> falak = new ArrayList<>();
+    private final Object farkas_monitor;
+    private final Object barany_monitor;
+    private final Object falak_monitor;
+    private  Object halottak_monitor;
     private Timer timer;
-    private Field myfield;
+    private final Field myfield;
     private int ennyi_ideje_megy_a_game;
-    private final int Ennyi_ideig_van_jatek =  50; // 50mp
+    private final int Ennyi_ideig_van_jatek =  200; // 50mp
     private final int falak_meghalasi_ideje = 30; // 3mp
 
     public void start(){
@@ -65,28 +72,38 @@ public class Field_Panel extends JPanel implements ActionListener {
         //g2d.drawString("Valami",100,100);
 
         // --------------------- BARANYOK ------------------------------------
-        if(!baranyok.isEmpty()) g2d.setColor(baranyok.getFirst().cubeColor);
-        for (Barany b : baranyok) {
-            g2d.fillRect((int) b.hely.x, (int) b.hely.y, 5, 5);
+        //if(!baranyok.isEmpty()) g2d.setColor(baranyok.getFirst().cubeColor);
+        synchronized (barany_monitor) {
+            for (Barany b : baranyok) {
+                g2d.setColor(b.cubeColor);
+                g2d.fillRect((int) b.hely.x, (int) b.hely.y, 5, 5);
+            }
         }
         // --------------------- FARKASOK  ------------------------------------
         if(!farkasok.isEmpty()) g2d.setColor(farkasok.getFirst().cubeColor);
-        for (Farkas b : farkasok) {
-            g2d.fillRect((int) b.hely.x, (int) b.hely.y, 5, 5);
+        synchronized (farkas_monitor) {
+            for (Farkas b : farkasok) {
+                g2d.fillRect((int) b.hely.x, (int) b.hely.y, 5, 5);
+            }
         }
         // --------------------- FALAK ------------------------------------
         if(!falak.isEmpty()) g2d.setColor(falak.getFirst().cubeColor);
         ArrayList<Falak> falak_amiket_ki_kell_torolni = new ArrayList<>();
-        for(Falak f : falak){
-            if(f.ennyi_maodperce_el>=falak_meghalasi_ideje){
-                falak_amiket_ki_kell_torolni.add(f);
+            synchronized (falak_monitor) {
+                for (Falak f : falak) {
+                    if (f.ennyi_maodperce_el >= falak_meghalasi_ideje) {
+                        falak_amiket_ki_kell_torolni.add(f);
+                    }
+                    g2d.fillRect((int) f.hely.x, (int) f.hely.y, 5, 5);
+                    f.ennyi_maodperce_el++;
+                }
             }
-            g2d.fillRect((int) f.hely.x, (int) f.hely.y, 5, 5);
-            f.ennyi_maodperce_el++;
-        }
-        for (Falak f: falak_amiket_ki_kell_torolni){
-            falak.remove(f);
-        }
+                synchronized (falak_monitor) {
+                    for (Falak f : falak_amiket_ki_kell_torolni) {
+                        falak.remove(f);
+                    }
+                }
+
     }
 
     /*private void drawObjects(Graphics2D g2d, List<? extends Allat> objects) {
@@ -103,6 +120,7 @@ public class Field_Panel extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) { // ez fog másodpercenként
         if(!myfield.game_over){
             myfield.AllatokMozog();
+            myfield.OsztMeghaltal_e();
 
             // ITT KELL A MOZGAST MEGVALOSITANI - VAGY NEM TUDOM
             this.baranyok = myfield.getBaranyok();

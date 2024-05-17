@@ -10,10 +10,11 @@ public abstract class Allat implements Runnable {
 
 
 
-    public synchronized String randomMozgas(ArrayList<Falak> falak) {
+    public synchronized String randomMozgas(ArrayList<Falak> falak,Object _falak_monitorf) {
         // Generálunk véletlenszerű irányokat
-        int irany_x =merre_menjenek;
+        int irany_x = merre_menjenek;
         int irany_y = ThreadLocalRandom.current().nextInt(-1, 2); // -1, 0, vagy 1 lehet az irány
+        //irany_x = ThreadLocalRandom.current().nextInt(-1, 2); // -1, 0, vagy 1 lehet az irány
 
         // Beállítjuk az új pozíciót a véletlenszerű irányok alapján
         int ujX = (int) (this.hely.x + irany_x);
@@ -21,41 +22,110 @@ public abstract class Allat implements Runnable {
 
 
         // Hogy a falak ne engedjék át --------------------------------------------------
-        boolean x_fal_utkozes = false;
-        boolean y_fal_utkozes = false;
-        for(Falak f : falak){
-            if((Math.abs(ujX - f.hely.x-5)<5)) x_fal_utkozes = true;
-            if((Math.abs(ujY - f.hely.y-5)<5)) y_fal_utkozes = true;
+        boolean fal_utkozes = false;
+        synchronized (_falak_monitorf){
+            for(Falak f : falak){
+                if((Math.abs(ujX - f.hely.x-5)<6) && (Math.abs(ujY - f.hely.y-5)<6)) {
+                    fal_utkozes = true;
+                    break;
+                }
+                //if()) y_fal_utkozes = true;
+            }
         }
 
+        if(!fal_utkozes){
+            // Hogy Y ne mehessen ki a palyarol ---------------------------------------------
+            if( ujY > 0  && ujY < Field.getPalyameret_y()-5 )  this.hely.y = ujY;
+            if (ujY > Field.getPalyameret_x()-5 )             this.hely.y = Field.getPalyameret_y()-5;
+            if (ujY < 0 )                                this.hely.y = 0;
 
-        // Hogy Y ne mehessen ki a palyarol ---------------------------------------------
-        if( ujY > 0  && ujY < Field.getPalyameret_y()-5  &&  !y_fal_utkozes)  this.hely.y = ujY;
-        if (ujY > Field.getPalyameret_x()-5 )             this.hely.y = Field.getPalyameret_y()-5;
-        if (ujY < 0 )                                this.hely.y = 0;
 
+            // Új érték
+            if (ujX > 0  && ujX < Field.getPalyameret_x() ) this.hely.x = ujX;
 
-        // Új érték
-        if (ujX > 0  && ujX < Field.getPalyameret_x() && !x_fal_utkozes ) this.hely.x = ujX;
+            // Ne menjen ki a pályáról ------------------------
+            if(!jobbra_atmehet && ujX >= Field.getPalyameret_x()-5 ) this.hely.x = Field.getPalyameret_x()-5;
+            if(!balra_atmehet && ujX <= 0) this.hely.x = 0;
 
-        // Ne menjen ki a pályáról ------------------------
-        if(!jobbra_atmehet && ujX >= Field.getPalyameret_x()-5 ) this.hely.x = Field.getPalyameret_x()-5;
-        if(!balra_atmehet && ujX <= 0) this.hely.x = 0;
-
-        // /JOBBRA, BALRA ÁTMEGY ---------------------------
-        if (ujX >= Field.getPalyameret_x() && jobbra_atmehet) {
-            this.hely.x = 0;
-            return "jobbra";
+            // /JOBBRA, BALRA ÁTMEGY ---------------------------
+            if (ujX >= Field.getPalyameret_x() && jobbra_atmehet) {
+                this.hely.x = 0;
+                return "jobbra";
+            }
+            if (ujX <= 0  && balra_atmehet ) {
+                this.hely.x = Field.getPalyameret_x()-5;
+                return "balra";
+            }
         }
-        if (ujX <= 0  && balra_atmehet ) {
-            this.hely.x = Field.getPalyameret_x()-5;
-            return "balra";
-        }
+
         return "marad";
     }
 
 
+    public synchronized String randomMozgas_Farkas(ArrayList<Falak> falak, ArrayList<Farkas> f_list, Object _farkas_monitor, Object _falak_monitor) {
+        // Generálunk véletlenszerű irányokat
+        int irany_x = merre_menjenek;
+        int irany_y = ThreadLocalRandom.current().nextInt(-1, 2); // -1, 0, vagy 1 lehet az irány
+        //irany_x = ThreadLocalRandom.current().nextInt(-1, 2); // -1, 0, vagy 1 lehet az irány
 
+        // Beállítjuk az új pozíciót a véletlenszerű irányok alapján
+        int ujX = (int) (this.hely.x + irany_x);
+        int ujY = (int) (this.hely.y + irany_y);
+
+
+        // Hogy a falak ne engedjék át --------------------------------------------------
+        boolean fal_utkozes = false;
+        synchronized (_falak_monitor){
+            for(Falak f : falak){
+                if((Math.abs(ujX - f.hely.x-5)<6) && (Math.abs(ujY - f.hely.y-5)<6)) {
+                    fal_utkozes = true;
+                    break;
+                }
+            }
+        }
+
+
+        boolean farkas_utkozes = false;
+        synchronized (_farkas_monitor){
+            for(Farkas f : f_list){
+                if(f != this){
+                    if((Math.abs(ujX - f.hely.x)<5) && (Math.abs(ujY - f.hely.y)<5)) {
+                        farkas_utkozes = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+
+
+
+        if(!farkas_utkozes && !fal_utkozes){
+            // Hogy Y ne mehessen ki a palyarol ---------------------------------------------
+            if( ujY > 0  && ujY < Field.getPalyameret_y()-5 )  this.hely.y = ujY;
+            if (ujY > Field.getPalyameret_x()-5 )             this.hely.y = Field.getPalyameret_y()-5;
+            if (ujY < 0 )                                this.hely.y = 0;
+
+
+            // Új érték
+            if (ujX > 0  && ujX < Field.getPalyameret_x() ) this.hely.x = ujX;
+
+            // Ne menjen ki a pályáról ------------------------
+            if(!jobbra_atmehet && ujX >= Field.getPalyameret_x()-5 ) this.hely.x = Field.getPalyameret_x()-5;
+            if(!balra_atmehet && ujX <= 0) this.hely.x = 0;
+
+            // /JOBBRA, BALRA ÁTMEGY ---------------------------
+            if (ujX >= Field.getPalyameret_x() && jobbra_atmehet) {
+                this.hely.x = 0;
+                return "jobbra";
+            }
+            if (ujX <= 0  && balra_atmehet ) {
+                this.hely.x = Field.getPalyameret_x()-5;
+                return "balra";
+            }
+        }
+        return "marad";
+    }
 
 
     void meghal(){

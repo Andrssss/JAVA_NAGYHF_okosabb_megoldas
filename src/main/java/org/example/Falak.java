@@ -14,4 +14,7 @@ public class Falak extends Allat {
         hely.y = y-30;
         cubeColor = new Color(70,70,70);
     }
+
+    public Falak() {
+    }
 }
