@@ -24,7 +24,6 @@ public class Palya implements Runnable{
 
     private static int timeout ;
 
-    Field myField ;
     WaitingFrame myw1;
     Object lock;
 
@@ -32,11 +31,10 @@ public class Palya implements Runnable{
     /**
      * KONSTUKTOR
      */
-    public Palya(Field f1,WaitingFrame w1,Object _lock)  {
+    public Palya(WaitingFrame w1,Object _lock)  {
         try {
             lock = _lock;
             myw1 =w1;
-            myField = f1;
             clientSocket = null;
             serverSocket = new ServerSocket(PORT_NUMBER);
             timeout = 100000;
@@ -51,9 +49,14 @@ public class Palya implements Runnable{
      */
     public void close() {
                 running = false;
-                if(MyPalya_szerver != null )  MyPalya_szerver.close();
+                System.out.println("MyPalya_szerver : "+ MyPalya_szerver );
+                if(MyPalya_szerver != null ){
+                    System.out.println("MyPalya_szerver nem null");
+                    MyPalya_szerver.close();
+                }
         try {
             serverSocket.close();
+            //clientSocket.close(); // todo , nem fasza, mert ekkor még el se fogadott ilyet
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -72,7 +75,6 @@ public class Palya implements Runnable{
 
 
                 while(running){
-                    System.out.println("Palya fut");
                         if (serverSocket != null) {
 
                             // TODO
@@ -84,7 +86,7 @@ public class Palya implements Runnable{
 
                             try {
                                 clientSocket = serverSocket.accept(); // itt elfogadja a kérést és nyit egy socketet
-                                MyPalya_szerver = new Palya_szerver(clientSocket,myField,myw1,lock);
+                                MyPalya_szerver = new Palya_szerver(clientSocket,myw1,lock);
                                 new Thread(MyPalya_szerver).run();
 
                                 //new Thread(MyPalya_szerver).run();
@@ -94,7 +96,7 @@ public class Palya implements Runnable{
                                 System.err.println("SERVER       - TIMEOUT");
                                 break; // A fő ciklust leállítjuk a timeout után
                             } catch (IOException e) {
-                                System.err.println("SERVER       - Failed to communicate with RAKTAR!");
+                                System.err.println("SERVER       - Failed to communicate with Kliens!");
                             }
                         }
                         else{

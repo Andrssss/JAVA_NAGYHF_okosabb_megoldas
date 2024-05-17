@@ -71,17 +71,12 @@ public class WaitingFrame extends JFrame implements ActionListener {
         if(e.getSource()==button1){
             switch (playernumber) {
                 case 1:
-                    try {
-                        SZERVER_INDUL();
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
+                    try {  this.SZERVER_INDUL(); }
+                    catch (InterruptedException ex) {  this.reconnect();  }
                     break;
                 case 2:
-                    KLIENS_PROBAL_CSATLAKOZNI();
-
+                    this.KLIENS_PROBAL_CSATLAKOZNI();
                     break;
-
                 default:
                     System.out.println("Valami felre ment");
             }
@@ -92,7 +87,14 @@ public class WaitingFrame extends JFrame implements ActionListener {
             new ChangePortFrame(playernumber);
         }
         else if(e.getSource()==button3){
-            if(MyPalya != null) MyPalya.close();
+            if(MyPalya != null) {
+                MyPalya.close();
+            }
+
+
+            Palya.running = false;
+
+
             frame.dispose();
         }
     }
@@ -109,6 +111,8 @@ public class WaitingFrame extends JFrame implements ActionListener {
     public void close(){
         frame.dispose();
     }
+
+
 
     private void KLIENS_PROBAL_CSATLAKOZNI() {
         Field f2 = new Field(2,true,_lock);
@@ -131,12 +135,12 @@ public class WaitingFrame extends JFrame implements ActionListener {
         label2.setText("Erros cant connect");
     }
     private void SZERVER_INDUL() throws InterruptedException {
+        //f1 = new Field(1,true,_lock2);
 
-        f1 = new Field(1,true,_lock2);
 
         // todo    CSAK ELSORE
         // todo
-        MyPalya = new Palya(f1,this,_lock2);
+        MyPalya = new Palya(this,_lock2);
         new Thread(MyPalya).start();
         // todo
         // todo

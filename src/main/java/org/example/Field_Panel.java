@@ -19,18 +19,21 @@ public class Field_Panel extends JPanel implements ActionListener {
     private final int Ennyi_ideig_van_jatek=  30; // 10mp
     private final int falak_meghalasi_ideje = 30; // 3mp
 
-
-
+    public void start(){
+        timer = new Timer(100, this);
+        timer.start();
+    }
 
 
     Field_Panel(Field field){
+
         ennyi_ideje_megy_a_game = 0;
         myfield = field;
         this.setPreferredSize(new Dimension(palyameret_x,palyameret_y));
         this.setBackground(Color.green);
 
-        timer = new Timer(100, this);
-        timer.start();
+
+        //timer.start(); // ez itt nem sexy
     }
 
 

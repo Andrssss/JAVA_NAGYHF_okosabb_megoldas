@@ -8,7 +8,7 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
     private static final int PORT_NUMBER= 19999;
     private final BufferedReader clientReader;
     protected static PrintWriter clientWriter;
-    private Field myField;
+    private Field myField=null;
     private final Object lock;
     private static WaitingFrame Myw1;
     private static int baranyaim = -1;
@@ -17,10 +17,9 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
 
 
 
-    Palya_szerver(Socket _clientSocket, Field f1, WaitingFrame w1,Object _lock) throws IOException {
+    Palya_szerver(Socket _clientSocket, WaitingFrame w1,Object _lock) throws IOException {
         lock = _lock;
         Myw1 =w1;
-        myField = f1;
         clientSocket = _clientSocket;
         this.clientReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         clientWriter = new PrintWriter(clientSocket.getOutputStream()); //
@@ -60,6 +59,7 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
             //BufferedReader serverInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
             if(clientSocket.isConnected()) {
+                myField = new Field(1,true,lock);
                 new Thread(myField).run();
                 if(Myw1!= null)  Myw1.close();
 

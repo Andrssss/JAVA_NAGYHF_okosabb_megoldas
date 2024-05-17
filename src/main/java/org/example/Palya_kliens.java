@@ -17,7 +17,7 @@ public class Palya_kliens implements Runnable{
     private Field myField=null;
     private static int baranyaim = -1;
 
-    private boolean running = true;
+    public static boolean running = true;
 
     private Thread myField_thread;
 
@@ -151,9 +151,11 @@ public class Palya_kliens implements Runnable{
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("Kliens : true vége");
+
+
             try {
                 clientSocket.close();
+                System.out.println("PLAYER2       - CLOSE SOKET: " + clientSocket.getPort());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

@@ -138,20 +138,24 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
         cur_hanydb_fal=0;
         readyToRockAndRoll = readyornot;
 
-        label1 = new JLabel(String.valueOf(readyToRockAndRoll));
-        label1.setBounds(100,60,150,15);
+        //label1 = new JLabel(String.valueOf(readyToRockAndRoll));
+        //label1.setBounds(100,60,150,15);
 
-        panel = new Field_Panel(this);
+
+
+        panel = new Field_Panel(this); // todo , ez itt indit egy szalat WTF
+        frame.add(panel);  // TODO
+
 
         frame.setTitle("PLAYER -  " + playernumber + " - FIELD");
-        //frame.add(label1);
-        frame.add(panel);
+
         frame.addMouseListener(this);
+        frame.pack();
         if(playernumber ==1) frame.setLocation(100, 100);
         if(playernumber ==2) frame.setLocation(700, 100);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
         frame.setLayout(null);
+
 
     }
 
@@ -182,11 +186,13 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
     @Override
     public void run() {
         System.out.println("Field fut P"  + playernumber);
+        panel.start();
+
         frame.setVisible(true);
-        Allatok_inditasa();
+        //Allatok_inditasa();
 
-
-        while(true){
+        boolean running = true;
+        while(running){
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -221,7 +227,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                 // vissza küldeni, hogy hány bárányom van
                 // aztán végeredmény kijelzo
                 // de azt lehet Palya szerveren
-                break;
+                running = false;
             }
         }
 
