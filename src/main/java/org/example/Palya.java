@@ -8,12 +8,17 @@ import static java.lang.String.valueOf;
 
 public class Palya implements Runnable{
     public Palya(WaitingFrame w1,Object _lock)  {
+        System.out.println("Palya : letrehozas");
+        timeout = 100000;
+        running=true;
+        lock = _lock;
+        myw1 =w1;
+        clientSocket = null;
+
+
+
         try {
-            lock = _lock;
-            myw1 =w1;
-            clientSocket = null;
             serverSocket = new ServerSocket(PORT_NUMBER);
-            timeout = 100000;
         }catch (IOException e){
             e.printStackTrace();
         }
@@ -23,43 +28,36 @@ public class Palya implements Runnable{
 
 
     public void run() {
-        System.out.println("Palya fut");
+        System.out.println("Palya : fut");
         try {
+            int csak_1_kapcsolat = 0;
             serverSocket.setSoTimeout(timeout);
 
 
-            while(running){
-                System.out.println("Palya ciklusban fut");
+            //while(running){
+                System.out.println("Palya : ciklusban fut");
                 if (serverSocket != null) {
-
-                    // TODO
-                    // EZ AKKOR NYILIK MEG, HA SIKERÜLT A CONNECTION
-                    if(clientSocket == null)  {
-                        //WaitingFrame frame = new WaitingFrame(1);
-                    }
-
-
                     try {
+                        System.out.println("Palya : kliens elfogadas");
+                        csak_1_kapcsolat++;
                         clientSocket = serverSocket.accept(); // itt elfogadja a kérést és nyit egy socketet
-                        MyPalya_szerver = new Palya_szerver(clientSocket,myw1,lock);
+                        MyPalya_szerver = new Palya_szerver(clientSocket,myw1,lock,this);
                         new Thread(MyPalya_szerver).run();
+                        running = false;
 
-                        //new Thread(MyPalya_szerver).run();
-                        //if(!running) break;
                     } catch (java.net.SocketTimeoutException ste) {
                         // Itt fut le, ha timeout történik
-                        System.err.println("SERVER       - TIMEOUT");
-                        break; // A fő ciklust leállítjuk a timeout után
+                        System.err.println("Palya       - TIMEOUT");
+                        //break; // A fő ciklust leállítjuk a timeout után
                     } catch (IOException e) {
-                        System.err.println("SERVER       - Failed to communicate with Kliens!");
+                        System.err.println("Palya       - Failed to communicate with Kliens!");
                     }
                 }
                 else{
-                    System.err.println("SERVER       - Server socket is not empty");
+                    System.err.println("Palya       - Server socket is not empty");
 
                 }
-
-            }
+            //}
         } catch (SocketException e) { throw new RuntimeException(e); }
         try {
             System.out.println("Palya : socket close");
@@ -82,12 +80,12 @@ public class Palya implements Runnable{
         PORT_NUMBER = newport;
     }
     public void close() {
-                running = false;
-                System.out.println("MyPalya_szerver : "+ MyPalya_szerver );
-                if(MyPalya_szerver != null ){
-                    System.out.println("MyPalya_szerver nem null");
-                    MyPalya_szerver.close();
-                }
+        running = false;
+        System.out.println("MyPalya_szerver : "+ MyPalya_szerver );
+        if(MyPalya_szerver != null ){
+            System.out.println("MyPalya_szerver nem null");
+            MyPalya_szerver.close();
+        }
         try {
             serverSocket.close();
             //clientSocket.close(); // todo , nem fasza, mert ekkor még el se fogadott ilyet
@@ -113,7 +111,7 @@ public class Palya implements Runnable{
     private WaitingFrame myw1;
     private Object lock;
     private static int timeout ;
-    public static boolean running = true; // todo getter // setter
+    public static boolean running; // todo getter // setter
     private Palya_szerver MyPalya_szerver = null;
     // -------------------------------------------------------------------------------
     // -------------------------------------------------------------------------------

@@ -14,13 +14,23 @@ public class Ending_Frame extends JFrame implements ActionListener {
 
 
     Ending_Frame(int en_baranyaim, int masik_baranyai ,int _playernumber){
-        String szoveg;
-        if(en_baranyaim>masik_baranyai)      szoveg = "Winner";
-        else if(en_baranyaim<masik_baranyai) szoveg = "Loser";
-        else                                 szoveg = "Egual";
+
+        if(en_baranyaim == -1 && masik_baranyai == -1 ){
+            label1 = new Label("Kapcsolat megszakadt");
+        }
+        else{
+            String szoveg;
+            if(en_baranyaim>masik_baranyai)      szoveg = "Winner";
+            else if(en_baranyaim<masik_baranyai) szoveg = "Loser";
+            else                                 szoveg = "Egual";
+            label1 = new Label( "You are the : " + szoveg + "( Mine : " + en_baranyaim + "  Her : " + masik_baranyai+" )");
+        }
+
+
+
+
 
         playernumber = _playernumber;
-        label1 = new Label( "You are the : " + szoveg + "( Mine : " + en_baranyaim + "  Her : " + masik_baranyai+" )");
         label1.setBounds(100,60,250,15);
         //label2 = new Label( "ready to connect");
 
@@ -59,8 +69,14 @@ public class Ending_Frame extends JFrame implements ActionListener {
             frame.dispose();
         }*/
         if(e.getSource()==button2){
-            if(playernumber == 1) Palya.running = false;
-            if(playernumber == 2) Palya_kliens.running = false;
+            if(playernumber == 1) {
+                Palya.running = false;
+                System.out.println("Ending_Frame : Palya running false");
+            }
+            if(playernumber == 2) {
+                Palya_kliens.running = false;
+                System.out.println("Ending_Frame : Palya_kliens running false");
+            }
             frame.dispose();
         }
     }

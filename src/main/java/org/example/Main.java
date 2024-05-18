@@ -2,14 +2,13 @@ package org.example;
 
 public class Main {
     public static void main(String[] args) {
-        // szerver
-        Allat.balra();
 
-        new WaitingFrame(1);
-        new WaitingFrame(2);
-        //Object lock = new Object();Field f1 = new Field(1,true,lock);f1.run();
-        //try {Thread.sleep(500);} catch (InterruptedException e) {throw new RuntimeException(e);}
-        //f1.SetGame_over();
+        //Allat.balra();
+
+        Palya_szerver.Palya_szerver_inditas();
+        Palya_kliens.Palya_kliens_inditas();
+
+
 
 
 
@@ -19,7 +18,7 @@ public class Main {
             System.out.println("Jelenleg futó szálak : "+ activeThreads);
             if(activeThreads == 2) break ;
             try {
-                Thread.sleep(500);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

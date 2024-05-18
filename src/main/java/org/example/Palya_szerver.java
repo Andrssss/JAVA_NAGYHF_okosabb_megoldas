@@ -1,12 +1,17 @@
 package org.example;
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 
 
 public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OLDALT
-    Palya_szerver(Socket _clientSocket, WaitingFrame w1,Object _lock) throws IOException {
+    Palya myPalya = null ;
+    Palya_szerver(Socket _clientSocket, WaitingFrame w1,Object _lock,Palya _myPalya) throws IOException {
+        myPalya = _myPalya;
         lock = _lock;
         Myw1 =w1;
+        kuldott_game_overt = false;
+
         myField = new Field(1,true,lock);
 
         clientSocket = _clientSocket;
@@ -54,26 +59,33 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
 
                 while (running) {
                     String kapott_allat = serverInput.readLine();
-                    System.out.println("Kliens Uzenet : "+ kapott_allat);
                     if (kapott_allat == null || kapott_allat.isEmpty()) {
                         //System.out.println("Kliens : Uzenet ures");
                         //Thread.sleep(1000);
                     }
                     else if (kapott_allat.startsWith("game_over")) {
+                        System.out.println("Palya_szerver : KAPOTT game_over-t");
                         // kapott uzenet ugy nez ki, hogy "game_over 2", ahol a szam a masik jatekos baranyait jelent
                         int masik_baranyai = convert_StringMessege_to_int(kapott_allat);
                         running = false;
 
                         synchronized (lock){
-                            lock.wait(100);
+                            lock.wait(1000);
                             new Ending_Frame(baranyaim,masik_baranyai,playernumber);
-                            System.out.println("KLIENS : ÉnBaranyaim-  "+  baranyaim + "  KliensBaranyai-  "+masik_baranyai);
+                            //System.out.println("Palya_szerver : ÉnBaranyaim-  "+  baranyaim + "  KliensBaranyai-  "+masik_baranyai);
                         }
+
+                        // todo
+                        // todo
+                        if(myPalya != null) myPalya.close();
+                        else {System.err.println("Palya_szerver : myPalya is null");}
+                        // todo
+                        // todo
                         break;
                         //  todo --- itt nem szabad bezárni
                         //clientSocket.close();
                     }else {
-                        System.out.println("Kliens 1 "+ kapott_allat);
+                        //System.out.println("Palya_szerver : "+ kapott_allat);
 
 
                         if (kapott_allat.substring(0, 6).equals("Barany")) {
@@ -87,7 +99,7 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
                             int y = Integer.parseInt(szavak[2]);
                             myField.addFarkas(x,y);
                         } else {
-                            System.err.println("KLIENS kapott uzenet : " + kapott_allat);
+                            System.err.println("Palya_szerver kapott uzenet : " + kapott_allat);
                         }
                     }
                 }
@@ -95,13 +107,27 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
 
 
             }
-        } catch (Exception e) {
+
+        } catch (SocketException e){
+            myField.setGame_over(true);
+            System.err.println("Palya_szerver : kapcsolat megszakadt");
+            running = false;
+            new Ending_Frame(-1,-1,playernumber);
+        }catch (Exception e) {
+            System.err.println("Palya_szerver : Exception ERROR");
             throw new RuntimeException(e);
         }
         try{
-            clientSocket.close();
-            System.out.println("PLAYER1       - CLOSE SOKET: " + clientSocket.getPort());
+            synchronized (lock){
+                if(!kuldott_game_overt) lock.wait(1000);
+
+                clientSocket.close();
+                System.out.println("PLAYER1       - CLOSE SOKET: " + clientSocket.getPort());
+            }
         } catch (IOException e) {
+            System.err.println("Palya_szerver : Exception ERROR");
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
@@ -121,6 +147,7 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
     // ------------------------------ FÜGGVENYEK  ------------------------------------
     // -------------------------------------------------------------------------------
     public void close(){
+        //todo     kuldott_game_overt
         try {
             myField.setGame_over(true);
             running = false;
@@ -140,7 +167,10 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
         }
         return number;
     }
+
+    private static void setKuldott_game_overt(){ kuldott_game_overt = true;}
     protected static void ennyi_baranyod_van(int ennyi_baranyom_van){
+        setKuldott_game_overt() ;
         baranyaim = ennyi_baranyom_van;
         try {
             sendLine("game_over"+baranyaim);
@@ -173,6 +203,7 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
     private static final int playernumber = 1;
     private static final int PORT_NUMBER= 19999;
     protected static PrintWriter clientWriter;
+    private static boolean kuldott_game_overt;
     private Field myField=null;
     private final Object lock;
     private static WaitingFrame Myw1;
@@ -183,10 +214,28 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
     // -------------------------------------------------------------------------------
 
 
-    public static void main(String[] args) {
+    public static void Palya_szerver_inditas() {
+
         WaitingFrame w1 = new WaitingFrame(playernumber);
         Myw1 = w1;
     }
+
+    public static void main(String[] args) {
+        WaitingFrame w1 = new WaitingFrame(playernumber);
+        Myw1 = w1;
+
+        while(true){
+            int activeThreads = Thread.activeCount();
+            System.out.println("Jelenleg futó szálak : "+ activeThreads);
+            if(activeThreads == 2) break ;
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
 }
 
 

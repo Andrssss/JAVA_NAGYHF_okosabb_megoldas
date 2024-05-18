@@ -2,24 +2,32 @@ package org.example;
 import java.awt.*;
 
 public class Farkas extends Allat implements Runnable {
-
-
     boolean running = true;
-    public void stopRunning() {
-        this.running = false; // Set the running flag to false to stop the thread
+    private Thread thread;
+    public void start() {
+        thread = new Thread(this);
+        thread.start();
     }
-
+    public void stopRunning() {
+        running = false;
+        if (thread != null) {
+            thread.interrupt();  // Megszakítja a szálat, ha éppen alszik
+        }
+    }
     @Override
     public void run() {
-        // TODO -------------------------
         while (running) {
-            //System.out.println("Farkas fut");
+            System.out.println("Farkas fut");
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                // Amikor a szál megszakad, az InterruptedException dobódik
+                // Ellenőrizni kell a running változót, hogy leállítsuk a szálat
+                Thread.currentThread().interrupt();  // Visszaállítja az interrupted flag-et
+                break;  // Kilépünk a ciklusból és a run metódusból, leállítva a szálat
             }
         }
+        //System.out.println("Barany leállt");
     }
 
 

@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class Allat implements Runnable {
+    protected static int  merre_menjenek = -5;
+
+
+
     @Override public void run() {}
 
 
@@ -89,7 +93,7 @@ public abstract class Allat implements Runnable {
         synchronized (_farkas_monitor){
             for(Farkas f : f_list){
                 if(f != this){
-                    if((Math.abs(ujX - f.hely.x)<5) && (Math.abs(ujY - f.hely.y)<5)) {
+                    if((Math.abs(ujX - f.hely.x)<6) && (Math.abs(ujY - f.hely.y)<6)) {
                         farkas_utkozes = true;
                         break;
                     }
@@ -157,7 +161,7 @@ public abstract class Allat implements Runnable {
 
 
 
-    protected static int  merre_menjenek = 1;
+
     protected Vectorr hely = new Vectorr();
     protected Color cubeColor;
     protected boolean eletben_van;
