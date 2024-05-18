@@ -15,7 +15,10 @@ public class ChangePortFrame extends JFrame implements ActionListener {
     private final JTextField textField2 = new JTextField();
     protected int  playernumber;
 
-
+    /**
+     * Itt lehet IP  illetve PORT számot változtatni.
+     * @param _playernumber Szerver oldalon nem megengedett az IP cím változtatása, lehetőséget se adok rá.
+     */
     ChangePortFrame(int _playernumber){
         playernumber = _playernumber;
         label.setBounds(0,0,100,50);
@@ -24,7 +27,7 @@ public class ChangePortFrame extends JFrame implements ActionListener {
         button2.addActionListener(this);
         button3.addActionListener(this);
 
-        // HA nem a szerver, mert neki IP-t valtoztatni
+        // HA nem a szerver, mert neki nem itt lehet IP-t valtoztatni. Az fura lenne
         if(playernumber != 1){
             button1.addActionListener(this);
             textField1.setPreferredSize(new Dimension(250,50));
@@ -57,7 +60,10 @@ public class ChangePortFrame extends JFrame implements ActionListener {
         frame.setVisible(true);
     }
 
-
+    /**
+     * Nézi a függvény, hogy a Frame-en hova kattittontunk
+     * @param e the event to be processed
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         /// ------------------------- BUTTON 1 ------------------------------------
@@ -87,6 +93,12 @@ public class ChangePortFrame extends JFrame implements ActionListener {
     }
 
 
+    /**
+     * Amikor PORT - ot szeretne változtatni, vizsgálja a függvény, hogy tényleg integer-e és nem engedi megváltoztatni, ha nem az.
+     * Ezt jelzi a felhasználónak egy furcsa módon.
+     * @param str A felhasználó által beállított PORT
+     * @return Bool érték, hogy int helyes e a Regex-e
+     */
     public static String isInteger(String str) {
         if (str.isEmpty() || !str.matches("^-?\\d+$")) {
             return " ";

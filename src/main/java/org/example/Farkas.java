@@ -2,8 +2,6 @@ package org.example;
 import java.awt.*;
 
 public class Farkas extends Allat implements Runnable {
-    boolean running = true;
-    private Thread thread;
     public void start() {
         thread = new Thread(this);
         thread.start();
@@ -17,7 +15,6 @@ public class Farkas extends Allat implements Runnable {
     @Override
     public void run() {
         while (running) {
-            System.out.println("Farkas fut");
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -27,7 +24,6 @@ public class Farkas extends Allat implements Runnable {
                 break;  // Kilépünk a ciklusból és a run metódusból, leállítva a szálat
             }
         }
-        //System.out.println("Barany leállt");
     }
 
 
@@ -41,11 +37,16 @@ public class Farkas extends Allat implements Runnable {
         if(x>XX) x = 495;
         if(x<0) x = 0;
         if(y>YY) y = 495;
-        if(x<0) y = 495;
+        if(y<0) y = 0;
 
         eletben_van = true;
         hely.x = x;
         hely.y = y-30;
         cubeColor = new Color(255, 0, 0);
     }
+
+
+
+    boolean running = true;
+    private Thread thread;
 }

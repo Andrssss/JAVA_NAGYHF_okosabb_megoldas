@@ -8,14 +8,19 @@ import java.net.SocketException;
 
 import static java.lang.String.valueOf;
 
-public class Palya_kliens implements Runnable{
-    protected Palya_kliens(String host1,Object _lock) {
-        lock = _lock;
-        Field f1 = new Field(2,true ,lock);
-        myField = f1;
-        host = host1;
-        kuldott_game_overt = false;
 
+/**
+ * Úgy lett mogoldva a kapcsolat, hogy van egy játékos aki a szerver és egy aki nem... Ő a nem szerver.
+ */
+public class Palya_kliens implements Runnable{
+    /**
+     * KONSTRUKTOR
+     */
+    protected Palya_kliens() {
+        lock = new Object();
+        myField = new Field(2,lock);
+        host = "localhost";
+        kuldott_game_overt = false;
 
 
         try{
@@ -61,6 +66,12 @@ public class Palya_kliens implements Runnable{
 
     /// --------------------------------       RUN     -----------------------------------------
     /// ----------------------------------------------------------------------------------------
+
+    /**
+     * Próbál csatlakozni, ha sikerűl, akkor figyel a beérkező üzenetekre, kéri a --Field-- -et, hogy adja hozzá a pályájához
+     * létrehozza a --Field-- -jét és ha kap egy
+     * "game_over" üzenetet, akkor meghívja a végeredményekkel a végső kijelzőt.
+     */
     public void run() {
 
         System.out.println("Kliens socket : "+ clientSocket.getPort()+ " " + PORT_NUMBER );
@@ -69,7 +80,6 @@ public class Palya_kliens implements Runnable{
             try {
                 BufferedReader serverInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 while (running) {
-
                     String kapott_allat = serverInput.readLine();
 
 
@@ -78,19 +88,18 @@ public class Palya_kliens implements Runnable{
                         //Thread.sleep(1000);
                     }
                     else if (kapott_allat.startsWith("game_over")) {
-                        System.out.println("Palya_kliens : KAPOTT game_over-t");
-                        // kapott uzenet ugy nez ki, hogy "game_over 2", ahol a szam a masik jatekos baranyait jelent
+                        System.out.println("Palya_kliens : KAPOTT game_over-t"); // kapott uzenet ugy nez ki, hogy "game_over 2", ahol a szam a masik jatekos baranyait jelent
+                        myField_thread.join(); // van, hogy kapcsolatot bont az előtt, hogy a pályája elküldi a befejezné a futást, das nem küldi el a másiknak, hogy mennyi báránya volt, ez azért baj, mert így a másik nem fog leállni, mert az eredményre vár
+
                         int masik_baranyai = convert_StringMessege_to_int(kapott_allat);
                         running = false;
                         close();
                         synchronized (lock){
-                            lock.wait(1000);
+                            lock.wait(100);
                             new Ending_Frame(baranyaim,masik_baranyai,playernumber);
                             //System.out.println("KLIENS : ÉnBaranyaim-  "+  baranyaim + "  KliensBaranyai-  "+masik_baranyai);
                         }
                         break;
-                        //  todo --- itt nem szabad bezárni
-                        //clientSocket.close();
                     }else {
                         //System.out.println("Kliens 1 "+ kapott_allat);
 
@@ -147,16 +156,34 @@ public class Palya_kliens implements Runnable{
 
     /// ------------------- GETTER / SETTER ----------------------------------------------------
     /// ----------------------------------------------------------------------------------------
+
+    /**
+     * --WaintigFrame-- -re jazoláshoz kell ez a függvény
+     * @return host
+     */
     protected static String getHost() {return host;}
+
+    /**
+     * --ChangePortFrame-- -állítja be, hogy melyik IP-re csatlakozzunk rá
+     * @param host host
+     */
     protected static void setHost(String host) {Palya_kliens.host = host;  }
+    /**
+     * --WaintigFrame-- -re jazoláshoz kell ez a függvény
+     * @return PORTNUMBER
+     */
     protected static String getPORT_NUMBER() { return valueOf(PORT_NUMBER);  }
+    /**
+     * --ChangePortFrame-- -állítja be, hogy melyik IP-re csatlakozzunk rá
+     * @return PORTNUMBER
+     */
     protected static void setPORT_NUMBER(int newport) { PORT_NUMBER = newport;  }
+
+    /**
+     * run(), hívja meg, ha kap egy "game-over"-t
+     * @throws IOException Ha kapcsolat megszakad
+     */
     protected void close() throws IOException {clientSocket.close();  myField.setGame_over(true); running= false;}
-    // todo ------------
-    // todo ------------
-    // todo ------------
-    // todo ------------
-    // todo ------------
     /// ----------------------------------------------------------------------------------------
     /// ----------------------------------------------------------------------------------------
 
@@ -165,6 +192,11 @@ public class Palya_kliens implements Runnable{
 
     /// ---------------------------- PRIVATE FUGGVENYEK  ---------------------------------------
     /// ----------------------------------------------------------------------------------------
+    /**
+     * Amikor megkapja a "game_over 6" üzenetet, akkor abból a "6" a másik bárányai. Ez a függvény ezt a számot vágja le.
+     * @param kapott_allat "game_over 6" szerű üzenetek
+     * @return A szám, hogy másiknak mennyi báránya van az üzenet alapján.
+     */
     private int convert_StringMessege_to_int(String kapott_allat){
         String remainingText = kapott_allat.substring(9);
         int number=0;
@@ -177,6 +209,11 @@ public class Palya_kliens implements Runnable{
         System.out.println("Kliens :  szerver baranyai : " + number);
         return number;
     }
+    /**
+     * A --Field-- -től kapunk egy számot, hogy mennyi bárányunk van. Ha a játéknak vége.
+     * Ez a függvény ez is küldi a másik játékosnak, az eredményt.
+     * @param ennyi_baranyom_van
+     */
     protected static void ennyi_baranyod_van(int ennyi_baranyom_van){
         kuldott_game_overt = true;
         baranyaim = ennyi_baranyom_van;
@@ -186,6 +223,12 @@ public class Palya_kliens implements Runnable{
             throw new RuntimeException(e);
         }
     }
+    /**
+     * Ezt a függvényt a --Field-- használja állatok küldésére. "static" mert amúgyse terveztem ezt a játékot, több mint 2 játékosra és így sok sor kódot megspórolt.
+     * Továbbá az ennyi_baranyod_van() függvény hívja meg, küldére.
+     * @param line Az elküldendő üzenet
+     * @throws IOException Ha idő közben socket -el valami történt.
+     */
     protected static void sendLine(String line) throws IOException {
         //System.out.println("Kliens send : "+ line + " to : " +clientSocket.getInetAddress()+" : "+ PORT_NUMBER);
         clientWriter.print(line + "\r\n");
@@ -202,8 +245,8 @@ public class Palya_kliens implements Runnable{
     private static String host="localhost";
     private static PrintWriter clientWriter;
     private static final int playernumber = 2;
-    private Object lock;
-    private Field myField=null;
+    private final Object lock;
+    private final Field myField;
     private static int baranyaim = -1;
     public static boolean running = true;
     private Thread myField_thread;
@@ -213,16 +256,20 @@ public class Palya_kliens implements Runnable{
     // -------------------------------------------------------------------------------
 
 
-
-
-
-
+    /**
+     * main-ből inditható legyen a KLIENS
+     */
     public static void Palya_kliens_inditas() {
 
-        WaitingFrame w1 = new WaitingFrame(2);
+        new WaitingFrame(2);
     }
+
+
+    /**
+     * Saját main
+     */
     public static void main(String[] args) {
-        WaitingFrame w1 = new WaitingFrame(playernumber);
+        new WaitingFrame(playernumber);
 
         while(true){
             int activeThreads = Thread.activeCount();

@@ -8,8 +8,18 @@ import java.util.Iterator;
 
 
 public class Field_Panel extends JPanel implements ActionListener {
-    private final int Ennyi_ideig_van_jatek =  50; // 50mp
+    private final int Ennyi_ideig_van_jatek =  50; // 5mp
     private final int falak_meghalasi_ideje = 30; // 3mp
+
+
+    /**
+     * KONSTRUKTOR
+     * @param field A field, amire rajzol. Erre azért van szükség, mert ez a szál számolja az eltelt időt és szól a --Field-- - nek
+     *              ha vége van a játékos időnek. Bezárásra kéri fel.
+     * @param _barany_monitor Erre azért van szükség, hogy ne akadjon össze a --Field-- -el (minden 10.-ik futtatásra sikerült)
+     * @param _farkas_monitor Erre azért van szükség, hogy ne akadjon össze a --Field-- -el
+     * @param _falak_monitor Erre azért van szükség, hogy ne akadjon össze a --Field-- -el
+     */
     Field_Panel(Field field,Object _barany_monitor,Object _farkas_monitor,Object _falak_monitor){
         barany_monitor = _barany_monitor;
         farkas_monitor = _farkas_monitor;
@@ -19,9 +29,6 @@ public class Field_Panel extends JPanel implements ActionListener {
         myfield = field;
         this.setPreferredSize(new Dimension(Field.palyameret_x,Field.palyameret_y));
         this.setBackground(Color.green);
-
-
-        //timer.start(); // ez itt nem sexy
     }
 
 
@@ -39,17 +46,19 @@ public class Field_Panel extends JPanel implements ActionListener {
     private int ennyi_ideje_megy_a_game;
 
 
+    /**
+     * Elindításával a timer szál is elindul.
+     */
     public void start(){
         timer = new Timer(100, this);
         timer.start();
     }
 
 
-
-
-
-
-
+    /**
+     * Ez a függvény fogja kirajzolni a mindent. Ha egy fal ideje letelt, akkor törli a listából.
+     * @param g  the <code>Graphics</code> context in which to paint
+     */
     public void paint(Graphics g) {
         ennyi_ideje_megy_a_game++;
 
@@ -117,19 +126,28 @@ public class Field_Panel extends JPanel implements ActionListener {
     }*/
 
 
+    /**
+     * Ez fog adot időközönként meghívódni. Ekkor elkéri a --Field-- -től a az objektumokat.
+     * Majd mozgatást kér.
+     * Majd az elhullot állatok kiszelektálását.
+     * És csak ezután rajzolja ki őket.
+     * @param e the event to be processed
+     */
     @Override
-    public void actionPerformed(ActionEvent e) { // ez fog másodpercenként
+    public void actionPerformed(ActionEvent e) { // ez fog másodpercenként meghívodni
         if(!myfield.game_over){
             myfield.AllatokMozog();
             myfield.OsztMeghaltal_e();
 
-            // ITT KELL A MOZGAST MEGVALOSITANI - VAGY NEM TUDOM
-
-            synchronized (barany_monitor){  this.baranyok = myfield.getBaranyok();  }
-            synchronized (farkas_monitor){  this.farkasok = myfield.getFarkasok();  }
-            synchronized (falak_monitor) {  this.falak    = myfield.getFalak();     }
-
-
+            synchronized (barany_monitor){
+                this.baranyok = myfield.getBaranyok();
+            }
+            synchronized (farkas_monitor){
+                this.farkasok = myfield.getFarkasok();
+            }
+            synchronized (falak_monitor) {
+                this.falak    = myfield.getFalak();
+            }
 
             repaint();
         }

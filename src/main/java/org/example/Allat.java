@@ -4,16 +4,26 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
+
+/**
+ * Ez foglalja egy csokorba a közös tulajdonságokat
+ */
 public abstract class Allat implements Runnable {
     protected static int  merre_menjenek = -5;
 
 
-
+    /**
+     * Nem példányosítható, nem tud futni
+     */
     @Override public void run() {}
 
 
-
-
+    /**
+     * Random mozgása a nem Farkas típusú állatoknak. Fallal nem ütközhetnek, Pályáról nem mehetnek ki. Átmehetnek másik pályára
+     * @param falak Amiknek neki ütközhetnek.
+     * @param _falak_monitorf Monitor, hogy szinkronban legyen --Field-- és --Field_panel-- -al
+     * @return Azt küldi vissza, hogy átment-e a másik pályára
+     */
     public synchronized String randomMozgas(ArrayList<Falak> falak,Object _falak_monitorf) {
         // Generálunk véletlenszerű irányokat
         int irany_x = merre_menjenek;
@@ -66,6 +76,14 @@ public abstract class Allat implements Runnable {
     }
 
 
+    /**
+     * Farkasok mozgása annyival másabb, a többi állathoz képest, hogy nem léphetnek rá egymás lábára
+     * @param falak Falaknak neki tudnak ütközni
+     * @param f_list Farkasoknak neki tudnak ütközni
+     * @param _farkas_monitor Monitor, hogy szinkronban legyen --Field-- és --Field_panel-- -al
+     * @param _falak_monitor Monitor, hogy szinkronban legyen --Field-- és --Field_panel-- -al
+     * @return Azt küldi vissza, hogy átment-e a másik pályára
+     */
     public synchronized String randomMozgas_Farkas(ArrayList<Falak> falak, ArrayList<Farkas> f_list, Object _farkas_monitor, Object _falak_monitor) {
         // Generálunk véletlenszerű irányokat
         int irany_x = merre_menjenek;
@@ -81,7 +99,7 @@ public abstract class Allat implements Runnable {
         boolean fal_utkozes = false;
         synchronized (_falak_monitor){
             for(Falak f : falak){
-                if((Math.abs(ujX - f.hely.x-5)<6) && (Math.abs(ujY - f.hely.y-5)<6)) {
+                if((Math.abs(ujX - f.hely.x-5)<5) && (Math.abs(ujY - f.hely.y-5)<5)) {
                     fal_utkozes = true;
                     break;
                 }
@@ -93,7 +111,7 @@ public abstract class Allat implements Runnable {
         synchronized (_farkas_monitor){
             for(Farkas f : f_list){
                 if(f != this){
-                    if((Math.abs(ujX - f.hely.x)<6) && (Math.abs(ujY - f.hely.y)<6)) {
+                    if((Math.abs(ujX - f.hely.x)<5) && (Math.abs(ujY - f.hely.y)<5)) {
                         farkas_utkozes = true;
                         break;
                     }
@@ -132,14 +150,19 @@ public abstract class Allat implements Runnable {
     }
 
 
+    /**
+     * Nem igazán lett ez a funkció kihasználva
+     */
     void meghal(){
         eletben_van = false;
         cubeColor =  new Color(0,0,0);
     }
 
 
-
-
+    /**
+     * Azért van erre szükség, mert ez adja meg, hogy merre tud átmenni
+     * @param ide Ettől függően tud jobbra/balra átmenni
+     */
     public void setGazdi(int ide){
         this.gazdi = ide;
         switch (ide){
@@ -155,8 +178,13 @@ public abstract class Allat implements Runnable {
     }
 
 
-
+    /**
+     * Main - ben változtatható, hogy merre menjenek az állatok
+     */
     public static void jobbra(){   merre_menjenek = 5;   }
+    /**
+     * Main - ben változtatható, hogy merre menjenek az állatok
+     */
     public static void balra(){    merre_menjenek = -5;   }
 
 

@@ -5,14 +5,14 @@ import java.net.SocketException;
 
 
 public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OLDALT
-    Palya myPalya = null ;
+
     Palya_szerver(Socket _clientSocket, WaitingFrame w1,Object _lock,Palya _myPalya) throws IOException {
         myPalya = _myPalya;
         lock = _lock;
         Myw1 =w1;
         kuldott_game_overt = false;
 
-        myField = new Field(1,true,lock);
+        myField = new Field(1,lock);
 
         clientSocket = _clientSocket;
         clientWriter = new PrintWriter(clientSocket.getOutputStream()); //
@@ -37,22 +37,18 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
 
 
 
-    /**
-     * Minden beszelgetesnek kulon szala van. 2 dolog van amit vedeni kell a tobbszalusagtol -> check_out_item() & addnewitem()
-     */
     /// ---------------------------------   RUN      -------------------------------------------
     /// ----------------------------------------------------------------------------------------
+    /**
+     * Ha a kapcsolat létrejött, akkor figyel a beérkező üzenetekre, kéri a --Field-- -et, hogy adja hozzá a pályájához az állatokat.
+     * létrehozza a --Field-- -jét és ha kap egy "game_over" üzenetet,
+     * akkor meghívja a végeredményekkel a végső kijelzőt.
+     */
     public void run() {
         System.out.println("Palya_szerver fut");
         try {
-            //BufferedReader serverInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
             if(clientSocket.isConnected()) {
-
-                //new Thread(myField).run();
                 if(Myw1!= null)  Myw1.close();
-
-
                 System.out.println("PLAYER1       - KAPCSOLAT ELINDULT A : " + clientSocket.getPort() + " -AL");
 
                 BufferedReader serverInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -65,12 +61,14 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
                     }
                     else if (kapott_allat.startsWith("game_over")) {
                         System.out.println("Palya_szerver : KAPOTT game_over-t");
+                        myField_thread.join(); // hogy egyszerre ne tudjon több csaklakozni
+
                         // kapott uzenet ugy nez ki, hogy "game_over 2", ahol a szam a masik jatekos baranyait jelent
                         int masik_baranyai = convert_StringMessege_to_int(kapott_allat);
                         running = false;
 
                         synchronized (lock){
-                            lock.wait(1000);
+                            lock.wait(100);
                             new Ending_Frame(baranyaim,masik_baranyai,playernumber);
                             //System.out.println("Palya_szerver : ÉnBaranyaim-  "+  baranyaim + "  KliensBaranyai-  "+masik_baranyai);
                         }
@@ -79,11 +77,7 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
                         // todo
                         if(myPalya != null) myPalya.close();
                         else {System.err.println("Palya_szerver : myPalya is null");}
-                        // todo
-                        // todo
                         break;
-                        //  todo --- itt nem szabad bezárni
-                        //clientSocket.close();
                     }else {
                         //System.out.println("Palya_szerver : "+ kapott_allat);
 
@@ -108,11 +102,13 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
 
             }
 
-        } catch (SocketException e){
+        } catch (SocketException e){           // KAPCSOLAT MEGSZAKADT
             myField.setGame_over(true);
             System.err.println("Palya_szerver : kapcsolat megszakadt");
             running = false;
             new Ending_Frame(-1,-1,playernumber);
+            myPalya.close();
+            this.close();
         }catch (Exception e) {
             System.err.println("Palya_szerver : Exception ERROR");
             throw new RuntimeException(e);
@@ -146,9 +142,13 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
 
     // ------------------------------ FÜGGVENYEK  ------------------------------------
     // -------------------------------------------------------------------------------
+
+    /**
+     * --Palya-- hívja meg, ha nem sikerűlt csatlakozni
+     * run() hívja meg, ha "game_over" -t kap.
+     */
     public void close(){
-        //todo     kuldott_game_overt
-        try {
+               try {
             myField.setGame_over(true);
             running = false;
             clientSocket.close();
@@ -157,6 +157,12 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * Amikor megkapja a "game_over 6" üzenetet, akkor abból a "6" a másik bárányai. Ez a függvény ezt a számot vágja le.
+     * @param kapott_allat "game_over 6" szerű üzenetek
+     * @return A szám, hogy másiknak mennyi báránya van az üzenet alapján.
+     */
     private int convert_StringMessege_to_int(String kapott_allat){
         String remainingText = kapott_allat.substring(9);
         int number=0;
@@ -168,7 +174,17 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
         return number;
     }
 
+    /**
+     * Azért van rá szükség, hogy biztosan elküldje a game_over üzenetet. Enélkül néha előbb állt le a szál, minthogy küldött volna.
+     */
     private static void setKuldott_game_overt(){ kuldott_game_overt = true;}
+
+
+    /**
+     * A --Field-- -től kapunk egy számot, hogy mennyi bárányunk van. Ha a játéknak vége.
+     * Ez a függvény ez is küldi a másik játékosnak, az eredményt.
+     * @param ennyi_baranyom_van
+     */
     protected static void ennyi_baranyod_van(int ennyi_baranyom_van){
         setKuldott_game_overt() ;
         baranyaim = ennyi_baranyom_van;
@@ -178,6 +194,13 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * Ezt a függvényt a --Field-- használja állatok küldésére. "static" mert amúgyse terveztem ezt a játékot, több mint 2 játékosra és így sok sor kódot megspórolt.
+     * Továbbá az ennyi_baranyod_van() függvény hívja meg, küldére.
+     * @param line Az elküldendő üzenet
+     * @throws IOException Ha idő közben socket -el valami történt.
+     */
     protected static void sendLine(String line) throws IOException {
         // NULLPOINTER ERROR
         if(clientSocket!=null){
@@ -204,25 +227,30 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
     private static final int PORT_NUMBER= 19999;
     protected static PrintWriter clientWriter;
     private static boolean kuldott_game_overt;
-    private Field myField=null;
+    private final Field myField;
     private final Object lock;
     private static WaitingFrame Myw1;
     private static int baranyaim = -1;
     private boolean running = true;
     private Thread myField_thread;
+    private final Palya myPalya;
     // -------------------------------------------------------------------------------
     // -------------------------------------------------------------------------------
 
-
+    /**
+     * Hogy Main-ből hívható legyen.
+     */
     public static void Palya_szerver_inditas() {
-
-        WaitingFrame w1 = new WaitingFrame(playernumber);
-        Myw1 = w1;
+        Myw1 = new WaitingFrame(playernumber);
     }
 
+
+    /**
+     * Saját main
+     * @param args isten se tudja micsoda
+     */
     public static void main(String[] args) {
-        WaitingFrame w1 = new WaitingFrame(playernumber);
-        Myw1 = w1;
+        Myw1 = new WaitingFrame(playernumber);
 
         while(true){
             int activeThreads = Thread.activeCount();

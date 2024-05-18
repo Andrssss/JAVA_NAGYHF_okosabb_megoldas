@@ -4,16 +4,27 @@ import java.util.concurrent.ThreadLocalRandom;
 import static java.lang.Math.floor;
 import static java.lang.Math.sqrt;
 
+
+/**
+ * Csokorba összeszedve az összes vector művelet, amire szükség lett volna
+ */
 public class Vectorr {
     double x, y;
 
+    /**
+     * konstruktor
+     * @param xx palya meret x
+     * @param yy palya meret y
+     */
     Vectorr(double xx, double yy){
         this.x = xx;
         this.y = yy;
     }
     Vectorr(){}
 
-
+    /**
+     * Ha allatot szeretnenk letrehozni, random helyre, akkor ez a right way
+     */
     void random()
     {
         float x_randomNumber = ThreadLocalRandom.current().nextInt(Field.getPalyameret_x());
@@ -21,6 +32,9 @@ public class Vectorr {
         x = floor(x_randomNumber % Field.getPalyameret_x());
         y = floor(y_randomNumber % Field.getPalyameret_y());
     }
+
+
+    /*
     float hosszNegyzet()
     {
         return (float) (x*x + y*y);
@@ -82,4 +96,5 @@ public class Vectorr {
             return new Vectorr(0, 0);
         }
     }
+    */
 }

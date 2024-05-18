@@ -5,6 +5,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 
+
+/**
+ * Ez a Frame a főablak lesz, innen lehet elindítani a csatlakozást, PORT/IP-t valtoztatni, vagy kilépni
+ */
 public class WaitingFrame extends JFrame implements ActionListener {
     private Label label1;
     private final Label label2;
@@ -17,12 +21,10 @@ public class WaitingFrame extends JFrame implements ActionListener {
     private Palya MyPalya = null;
 
 
-
-
-
-
-
-
+    /**
+     * KONSTRUKTOR
+     * @param _playernumber Ez a cím miatt fontos és azért mert másképp kezeljük a SZERVERT és a KLIENST. És máshova is hozzuk létre az ablakot.
+     */
     public WaitingFrame(int _playernumber){
         playernumber = _playernumber;
 
@@ -62,21 +64,26 @@ public class WaitingFrame extends JFrame implements ActionListener {
     }
 
 
-
-
-
-
-
+    /**
+     * Ezt arra használom, hogy megnézzem, hogy a --Palya_kliens-- -nek sikerült-e csatlakozni, mert ha nem akkor pár dolgot változtatok
+     * pl: "Csatlakozás" -> "retry"
+     * @param mess A --Palya_kliens-- küldi, hogy sikerült-e csatlakozni
+     */
     public static void setMessege(String mess){  messege = mess;  }
+
+    /**
+     * Saját magát hívja meg. Becsukja a Frame-et
+     */
     public void close(){  frame.dispose();  }
 
 
-
-
-
+    /**
+     * Ha playernumber == 2, akkor kliens típusú csatlakozásról van szó.
+     */
     private void KLIENS_PROBAL_CSATLAKOZNI() {
-        Object _lock= new Object();
-        Palya_kliens p1 = new Palya_kliens("localhost",_lock);
+        //Object _lock= new Object();
+        //Palya_kliens p1 = new Palya_kliens("localhost",_lock);
+        Palya_kliens p1 = new Palya_kliens();
         Thread t1 = new Thread(p1);
         if(messege.equals("success")){
             t1.start();
@@ -92,9 +99,17 @@ public class WaitingFrame extends JFrame implements ActionListener {
     }
 
 
+    /**
+     * Ha a szerver csatlakozásra vár, ott van time out és ezt kiírja a GUI-ra, ha megtörténik
+     */
+    public void timeout(){
+        label1.setText("ERROR : timeout (100sec)");
+    }
 
-
-
+    /**
+     * Ha playernumber == 1, akkor kliens típusú csatlakozásról van szó. Ha kliens még nem csatlakozott, akkor "Waiting for Player2"
+     * és megvárja még csatlakozik.
+     */
     private void SZERVER_INDUL() throws InterruptedException {
         Object _lock2= new Object();
         MyPalya = new Palya(this,_lock2);
@@ -107,6 +122,11 @@ public class WaitingFrame extends JFrame implements ActionListener {
             label1.setText("Waiting for Player2");
     }
 
+
+    /**
+     * Nézi, hogy melyik gombot nyomta meg a Felhasználó
+     * @param e the event to be processed
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         // EZ A CSATLAKOZO GOMB ------------------------------------------

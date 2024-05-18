@@ -3,46 +3,55 @@ import java.awt.*;
 
 
 public class Barany extends Allat implements Runnable{
-    boolean running = true;
-    private Thread thread;
+    /**
+     * Elindít egy külön szálat az állatnak. Enélkül a fő szál ami indít, megkéne várnia, hogy lefut ez a szál
+     */
     public void start() {
         thread = new Thread(this);
         thread.start();
     }
 
-
+    /**
+     * A mozgást lehetett volna ide írni, de nekem a kapitalizált rendszer irányítás szempontjából szimpatikusabb volt.
+     * Interrupt-al az alvó szálat is ki lehet lőni, szuper hasznos.
+     */
     @Override
     public void run() {
         while (running) {
-            System.out.println("Barany fut");
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                // Amikor a szál megszakad, az InterruptedException dobódik
-                // Ellenőrizni kell a running változót, hogy leállítsuk a szálat
-                Thread.currentThread().interrupt();  // Visszaállítja az interrupted flag-et
-                break;  // Kilépünk a ciklusból és a run metódusból, leállítva a szálat
+                Thread.currentThread().interrupt();
+                break;
             }
         }
-        System.out.println("Barany leállt");
     }
 
 
-
+    /**
+     * Így lehet máshonnan meghívni a szál leállítását. Ez dobni fog egy interruptot és megállítja a run()-t.
+     */
     public void stopRunning() {
         running = false;
         if (thread != null) {
-            thread.interrupt();  // Megszakítja a szálat, ha éppen alszik
+            thread.interrupt();  // Megszakítja a szálat, ha éppen alszik, ha nem
         }
     }
 
-
+    /**
+     * Alap értékek beállítása, random helyre spannol.
+     */
     Barany() {
         eletben_van = true;
         hely.random();
         cubeColor = new Color(255, 255, 255);
     }
 
+    /**
+     * Alap értékek beállítása.
+     * @param x x helyen
+     * @param y y helyen
+     */
     Barany(int x, int y) {
         if(x>XX) x = 495;
         if(x<0) x = 0;
@@ -54,10 +63,7 @@ public class Barany extends Allat implements Runnable{
         hely.y = y-30;
         cubeColor = new Color(255, 255, 255);
     }
+    boolean running = true;
+    private Thread thread;
 
-
-    @Override
-    void meghal() {
-        stopRunning();
     }
-}
