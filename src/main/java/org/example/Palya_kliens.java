@@ -35,6 +35,7 @@ public class Palya_kliens implements Runnable{
             System.out.println("KLIENS : CSATLAKOZOTT");
             WaitingFrame.setMessege("success");
             myField_thread = new Thread(myField);
+            myField_thread.setPriority(10);
             myField_thread.start();
         }
         else {
@@ -95,7 +96,9 @@ public class Palya_kliens implements Runnable{
                         running = false;
                         close();
                         synchronized (lock){
-                            lock.wait(100);
+                            //while (baranyaim==-1) lock.wait(); // ez nagyon sexy elméleti síkon, de itt nem :/
+                            if(baranyaim==-1) lock.wait(500);
+                            //lock.wait(100);
                             new Ending_Frame(baranyaim,masik_baranyai,playernumber);
                             //System.out.println("KLIENS : ÉnBaranyaim-  "+  baranyaim + "  KliensBaranyai-  "+masik_baranyai);
                         }
@@ -119,7 +122,7 @@ public class Palya_kliens implements Runnable{
                         }
                     }
                 }
-
+                serverInput.close(); // Buffereder becsuk
             }catch (SocketException e){
                 myField.setGame_over(true);
                 System.err.println("Palya_kliens : kapcsolat megszakadt");
@@ -132,12 +135,12 @@ public class Palya_kliens implements Runnable{
                 throw new RuntimeException(e);
             }
             try {
-                synchronized (lock){
-                    if(!kuldott_game_overt) lock.wait(1000);
 
+                    if(!kuldott_game_overt) ennyi_baranyod_van(baranyaim);
+                    synchronized (lock) {lock.wait(500);}
                     clientSocket.close();
                     System.out.println("PLAYER2       - CLOSE SOKET: " + clientSocket.getPort());
-                }
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } catch (InterruptedException e) {

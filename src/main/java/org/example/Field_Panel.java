@@ -5,10 +5,11 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 
 public class Field_Panel extends JPanel implements ActionListener {
-    private final int Ennyi_ideig_van_jatek =  50; // 5mp
+    private final int Ennyi_ideig_van_jatek =  120; // 5mp
     private final int falak_meghalasi_ideje = 30; // 3mp
 
 
@@ -35,9 +36,9 @@ public class Field_Panel extends JPanel implements ActionListener {
 
 
     protected static Color palya_szine = new Color(0, 128, 60);
-    private ArrayList<Barany> baranyok = new ArrayList<>();
-    private ArrayList<Farkas> farkasok= new ArrayList<>();
-    private ArrayList<Falak> falak = new ArrayList<>();
+    private LinkedList<Barany> baranyok = new LinkedList<>();
+    private LinkedList<Farkas> farkasok= new LinkedList<>();
+    private LinkedList<Falak> falak = new LinkedList<>();
     private final Object farkas_monitor;
     private final Object barany_monitor;
     private final Object falak_monitor;
@@ -72,7 +73,8 @@ public class Field_Panel extends JPanel implements ActionListener {
         }
 
         // --------------------- BARANYOK ------------------------------------
-        synchronized (barany_monitor) {
+        //synchronized (barany_monitor) {
+        synchronized (baranyok) {
             Iterator<Barany> baranyIterator = baranyok.iterator();
             while (baranyIterator.hasNext()) {
                 Barany b = baranyIterator.next();
@@ -82,7 +84,8 @@ public class Field_Panel extends JPanel implements ActionListener {
         }
 
         // --------------------- FARKASOK  ------------------------------------
-        synchronized (farkas_monitor) {
+        //synchronized (farkas_monitor) {
+        synchronized (farkasok) {
             Iterator<Farkas> farkasIterator = farkasok.iterator();
             while (farkasIterator.hasNext()) {
                 Farkas f = farkasIterator.next();
@@ -93,7 +96,8 @@ public class Field_Panel extends JPanel implements ActionListener {
 
         // --------------------- FALAK ------------------------------------
         ArrayList<Falak> falak_amiket_ki_kell_torolni = new ArrayList<>();
-        synchronized (falak_monitor) {
+        //synchronized (falak_monitor) {
+        synchronized (falak) {
             Iterator<Falak> iterator = falak.iterator();
             while (iterator.hasNext()) {
                 Falak f = iterator.next();
@@ -139,13 +143,16 @@ public class Field_Panel extends JPanel implements ActionListener {
             myfield.AllatokMozog();
             myfield.OsztMeghaltal_e();
 
-            synchronized (barany_monitor){
+            synchronized (baranyok){
+            //synchronized (barany_monitor){
                 this.baranyok = myfield.getBaranyok();
             }
-            synchronized (farkas_monitor){
+            synchronized (farkasok){
+            //synchronized (farkas_monitor){
                 this.farkasok = myfield.getFarkasok();
             }
-            synchronized (falak_monitor) {
+            synchronized (falak) {
+            //synchronized (falak_monitor) {
                 this.falak    = myfield.getFalak();
             }
 

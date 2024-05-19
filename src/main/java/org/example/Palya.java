@@ -117,7 +117,7 @@ public class Palya implements Runnable {
         System.out.println("MyPalya_szerver : " + MyPalya_szerver);
         if (MyPalya_szerver != null) {
             System.out.println("MyPalya_szerver nem null");
-            MyPalya_szerver.close();
+            //MyPalya_szerver.close();
         }
         try {
             if (serverSocket != null && !serverSocket.isClosed()) {

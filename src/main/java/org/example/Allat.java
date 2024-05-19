@@ -2,6 +2,7 @@ package org.example;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.concurrent.ThreadLocalRandom;
 
 
@@ -24,7 +25,7 @@ public abstract class Allat implements Runnable {
      * @param _falak_monitorf Monitor, hogy szinkronban legyen --Field-- és --Field_panel-- -al
      * @return Azt küldi vissza, hogy átment-e a másik pályára
      */
-    public synchronized String randomMozgas(ArrayList<Falak> falak,Object _falak_monitorf) {
+    public synchronized String randomMozgas(LinkedList<Falak> falak, Object _falak_monitorf) {
         // Generálunk véletlenszerű irányokat
         int irany_x = merre_menjenek;
         int irany_y = ThreadLocalRandom.current().nextInt(-1, 2); // -1, 0, vagy 1 lehet az irány
@@ -84,7 +85,7 @@ public abstract class Allat implements Runnable {
      * @param _falak_monitor Monitor, hogy szinkronban legyen --Field-- és --Field_panel-- -al
      * @return Azt küldi vissza, hogy átment-e a másik pályára
      */
-    public synchronized String randomMozgas_Farkas(ArrayList<Falak> falak, ArrayList<Farkas> f_list, Object _farkas_monitor, Object _falak_monitor) {
+    public synchronized String randomMozgas_Farkas(LinkedList<Falak> falak, LinkedList<Farkas> f_list, Object _farkas_monitor, Object _falak_monitor) {
         // Generálunk véletlenszerű irányokat
         int irany_x = merre_menjenek;
         int irany_y = ThreadLocalRandom.current().nextInt(-1, 2); // -1, 0, vagy 1 lehet az irány

@@ -19,6 +19,7 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
 
         if (clientSocket != null) {
             myField_thread = new Thread(myField);
+            myField_thread.setPriority(10);
             myField_thread.start();
         }
         //this.outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -68,7 +69,8 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
                         running = false;
 
                         synchronized (lock){
-                            lock.wait(100);
+                            //while (baranyaim==-1) lock.wait();
+                            if(baranyaim==-1) lock.wait(500);
                             new Ending_Frame(baranyaim,masik_baranyai,playernumber);
                             //System.out.println("Palya_szerver : ÉnBaranyaim-  "+  baranyaim + "  KliensBaranyai-  "+masik_baranyai);
                         }
@@ -97,11 +99,9 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
                         }
                     }
                 }
-                //
-
-
+                // mindenképp be kell zárni Bufferreadert
+                serverInput.close();
             }
-
         } catch (SocketException e){           // KAPCSOLAT MEGSZAKADT
             myField.setGame_over(true);
             System.err.println("Palya_szerver : kapcsolat megszakadt");
@@ -114,12 +114,12 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
             throw new RuntimeException(e);
         }
         try{
-            synchronized (lock){
-                if(!kuldott_game_overt) lock.wait(1000);
 
+                if(!kuldott_game_overt) ennyi_baranyod_van(baranyaim);
+                synchronized (lock) {lock.wait(500);}
                 clientSocket.close();
                 System.out.println("PLAYER1       - CLOSE SOKET: " + clientSocket.getPort());
-            }
+
         } catch (IOException e) {
             System.err.println("Palya_szerver : Exception ERROR");
             throw new RuntimeException(e);
@@ -152,6 +152,7 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
             myField.setGame_over(true);
             running = false;
             clientSocket.close();
+            myPalya.close();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -186,7 +187,7 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
      * @param ennyi_baranyom_van
      */
     protected static void ennyi_baranyod_van(int ennyi_baranyom_van){
-        setKuldott_game_overt() ;
+        setKuldott_game_overt();
         baranyaim = ennyi_baranyom_van;
         try {
             sendLine("game_over"+baranyaim);

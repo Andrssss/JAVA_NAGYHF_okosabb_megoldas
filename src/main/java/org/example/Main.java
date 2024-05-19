@@ -16,15 +16,17 @@ public class Main {
 
 
 
+        // EXIT-et meg kell nyomni a GUI-n, hogy minden szál leálljon.
 
 
 
         while(true){
             int activeThreads = Thread.activeCount();
             System.out.println("Jelenleg futó szálak : "+ activeThreads);
-            if(activeThreads == 2) break ;
+           if(activeThreads == 2) break; // ( Main + Thread )
+
             try {
-                Thread.sleep(2000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

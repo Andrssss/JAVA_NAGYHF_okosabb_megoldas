@@ -5,6 +5,7 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 
 /**
@@ -12,7 +13,7 @@ import java.util.Iterator;
  * hogy a nehezebb számítások ne öljét meg azt a szálat.
  */
 public final class Field  extends JFrame  implements MouseListener, Runnable {
-    private int allakot_szama = 400; // farkas és bárányból is ennyi lesz egyenként
+    private int allakot_szama = 500; // 300 farkas + 300 bárány -> 600 szál / pálya
 
 
     /**
@@ -98,14 +99,16 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                 for (int i = 0; i < baranyok_szama; i++) {
                     Barany barany = new Barany();
                     barany.setGazdi(playernumber);
-                    synchronized (barany_monitor) {b_list.add(barany);} // Ez sok fejfájást okozott
+                    synchronized (b_list) {b_list.add(barany);} // Ez sok fejfájást okozott
+                    //synchronized (barany_monitor) {b_list.add(barany);} // Ez sok fejfájást okozott
                     // olyan nettó 2 óra depresszió
                     barany.start();
                 }
                 for (int i = 0; i < farkaso_szama; i++) {
                     Farkas f = new Farkas();
                     f.setGazdi(playernumber);
-                    synchronized (farkas_monitor){f_list.add(f);}
+                    synchronized (f_list){f_list.add(f);}
+                    //synchronized (farkas_monitor){f_list.add(f);}
                     f.start();
                 }
         }
@@ -118,9 +121,11 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
     public void OsztMeghaltal_e() {
         ArrayList<Barany> remove_b_list = new ArrayList<>();
 
-        synchronized (farkas_monitor) {
+        synchronized (f_list) {
+        //synchronized (farkas_monitor) {
             for (Farkas f : f_list) {
-                synchronized (barany_monitor) {
+                //synchronized (barany_monitor) {
+                synchronized (b_list) {
                     Iterator<Barany> baranyIterator = b_list.iterator();
                     while (baranyIterator.hasNext()) {
                         Barany b = baranyIterator.next();
@@ -133,7 +138,8 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
             }
         }
 
-        synchronized (barany_monitor) {
+        synchronized (b_list) {
+        //synchronized (barany_monitor) {
             for (Barany b : remove_b_list) {
                 b_list.remove(b);
             }
@@ -150,7 +156,8 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
             ArrayList<Barany> remove_b_list = new ArrayList<>();
             ArrayList<Farkas> remove_f_list = new ArrayList<>();
 
-            synchronized (barany_monitor){
+            synchronized (b_list){
+            //synchronized (barany_monitor){
                 for (Barany b : b_list) {
                     String eredmeny = b.randomMozgas(fal_list,falak_monitor);
 
@@ -182,7 +189,8 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                 }
             }
 
-            synchronized (farkas_monitor) {
+            synchronized (f_list) {
+            //synchronized (farkas_monitor) {
                 for (Farkas b : f_list) {
                     String eredmeny = b.randomMozgas_Farkas(fal_list,f_list,farkas_monitor,falak_monitor);
 
@@ -214,13 +222,15 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                 }
             }
 
-            synchronized (barany_monitor) { // sok fejfájás...
+            synchronized (b_list) { // sok fejfájás...
+            //synchronized (barany_monitor) { // sok fejfájás...
                 for (Barany b : remove_b_list) {
                     b.stopRunning();
                     b_list.remove(b);
                 }
             }
-            synchronized (farkas_monitor) {
+            synchronized (f_list) {
+            //synchronized (farkas_monitor) {
                 for (Farkas b : remove_f_list) {
                     b.stopRunning();
                     f_list.remove(b);
@@ -239,7 +249,8 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
         //System.out.println("Barany - y : " + " Player" + playernumber);
         Barany b = new Barany(x,y);
         b.setGazdi(playernumber);
-        synchronized (barany_monitor) {  b_list.add(b);  }
+        //synchronized (barany_monitor) {  b_list.add(b);  }
+        synchronized (b_list) {  b_list.add(b);  }
         //b.run(); EZ úgy megszopatott, de úgy .... Már negyedjére XDDDD
         //  szerintem egy teljes napom elment rá.... A tudás hatalom gyermekem
         if(game_over){System.err.println("Barany nem indul, mert game over");}
@@ -256,7 +267,8 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
         //System.out.println("Farkas - y : " + " Player" + playernumber);
         Farkas f = new Farkas(x, y);
         f.setGazdi(playernumber);
-        synchronized (farkas_monitor){  f_list.add(f);  }
+        synchronized (f_list){  f_list.add(f);  }
+        //synchronized (farkas_monitor){  f_list.add(f);  }
         if(game_over){System.err.println("Farkas nem indul, mert game over");}
         else{
             f.start();
@@ -272,19 +284,14 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
         if(game_over){
             synchronized (lock){
                 System.out.println("Field : belepett a végére");
-                for(Barany b : b_list){
-                    ennyi_baranyom_van++;
-                }
-                for(Farkas b : f_list){
-                    b.stopRunning();
-                }
-                for(Barany b : b_list){
-                    b.stopRunning();
-                }
+                //synchronized (farkas_monitor){ for(Farkas b : f_list){ b.stopRunning(); }}
+                synchronized (f_list){ for(Farkas b : f_list){ b.stopRunning(); }}
+                //synchronized (barany_monitor){for(Barany b : b_list){  ennyi_baranyom_van++;  b.stopRunning(); }}
+                synchronized (b_list){for(Barany b : b_list){  ennyi_baranyom_van++;  b.stopRunning(); }}
 
                 if(playernumber == 1) Palya_szerver.ennyi_baranyod_van(ennyi_baranyom_van);
                 if(playernumber == 2) Palya_kliens.ennyi_baranyod_van(ennyi_baranyom_van);
-                lock.notify();
+                lock.notifyAll();
                 //System.out.println("Player" +playernumber +" - "+ ennyi_baranyom_van);
                 frame.dispose();
             }
@@ -304,17 +311,17 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
      * A --Field-panel-- -nak ez a függvény küldi el a barikat. Ő ott lemásolja és rajzolja őket.
      * @return Küldi a teljese listát
      */
-    public ArrayList<Barany> getBaranyok() {return b_list; }
+    public LinkedList<Barany> getBaranyok() {return b_list; }
     /**
      * A --Field-panel-- -nak ez a függvény küldi el a farkasokat. Ő ott lemásolja és rajzolja őket.
      * @return Küldi a teljese listát
      */
-    public ArrayList<Farkas> getFarkasok(){ return f_list;}
+    public LinkedList<Farkas> getFarkasok(){ return f_list;}
     /**
      * A --Field-panel-- -nak ez a függvény küldi el a falakat. Ő ott lemásolja és rajzolja őket.
      * @return Küldi a teljese listát
      */
-    public ArrayList<Falak> getFalak(){ return fal_list; }
+    public LinkedList<Falak> getFalak(){ return fal_list; }
     /**
      * A palya x dimenziója
      * @return dimenzió
@@ -389,9 +396,9 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
 
     //  ------------------------  PRIVATE VALTOZOK JATEKHOZ  -------------------------
     // -------------------------------------------------------------------------------
-    private ArrayList<Barany> b_list =  new ArrayList<>();
-    private ArrayList<Farkas> f_list =  new ArrayList<>();
-    private ArrayList<Falak> fal_list =  new ArrayList<>();
+    private LinkedList<Barany> b_list =  new LinkedList<>(); // mondanom sem kell de ez fényévekkel gyorsabb, mint ArrayList... elképesztő
+    private LinkedList<Farkas> f_list =  new LinkedList<>();
+    private LinkedList<Falak> fal_list =  new LinkedList<>();
     private Object farkas_monitor = new Object(); // ezek a monitorok a Field és Field_monitor közti
     private Object barany_monitor = new Object(); // harcot vívja meg... Meg néha amikor mozgást végzi
     private Object falak_monitor = new Object(); // a Field, akkor a ciklus közepén jön egy új bárány
