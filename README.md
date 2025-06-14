@@ -4,3 +4,5 @@ I need to do a little game, what is a 2 player thing. And of course u can play i
 The first player is the server, and the seccond is connecting. 
 
 Its a fun experience, but oh god, why i have 6 more course.
+
+![Image](https://github.com/user-attachments/assets/c2f3ebda-fb0d-4c8d-8fea-04bcc4f46fa6)
