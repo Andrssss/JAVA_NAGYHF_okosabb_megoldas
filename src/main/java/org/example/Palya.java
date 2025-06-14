@@ -41,35 +41,34 @@ public class Palya implements Runnable {
      */
     public void run() {
         System.out.println("Palya : fut");
+
         try {
             serverSocket.setSoTimeout(timeout);
 
             while (running) {
                 System.out.println("Palya : ciklusban fut");
-                if (serverSocket != null) {
+                if (serverSocket != null ) {
                     try {
-                        System.out.println("Palya : kliens elfogadas");
-                        clientSocket = serverSocket.accept(); // itt elfogadja a kérést és nyit egy socketet
-                        MyPalya_szerver = new Palya_szerver(clientSocket, myw1, lock, this);
-                        Thread serverThread = new Thread(MyPalya_szerver);
-                        serverThread.start();
+                        if(szamolo==0){
+                            System.out.println("Palya : kliens elfogadas");
+                            clientSocket = serverSocket.accept(); // itt elfogadja a kérést és nyit egy socketet
+                            MyPalya_szerver = new Palya_szerver(clientSocket, myw1, lock, this);
 
-                        // Megvárjuk, hogy a MyPalya_szerver befejezze a futását
-                        serverThread.join();
+                            MyPalya_szerver.run();
+                            // Megvárjuk, hogy a MyPalya_szerver befejezze a futását
+                            szamolo++;
+
+                        }
+
 
                         // Amikor a MyPalya_szerver befejeződött, újra elfogadunk kapcsolatot
-                        clientSocket = null;
-                        MyPalya_szerver = null;
+
                     } catch (java.net.SocketTimeoutException ste) {
                         // Itt fut le, ha timeout történik
                         myw1.timeout();
                         System.err.println("Palya       - TIMEOUT");
                     } catch (IOException e) {
                         System.err.println("Palya       - Failed to communicate with Kliens!");
-                    } catch (InterruptedException e) {
-                        System.err.println("Palya       - Interrupted while waiting for server thread to finish.");
-                        Thread.currentThread().interrupt();
-                        break; // Kilépés a while ciklusból megszakítás esetén
                     }
                 } else {
                     System.err.println("Palya       - Server socket is not empty");
@@ -131,6 +130,7 @@ public class Palya implements Runnable {
     //  ------------------------  PRIVATE VALTOZOK JATEKHOZ  -------------------------
     protected ServerSocket serverSocket;
     protected Socket clientSocket;
+    private int szamolo = 0;
     private static int PORT_NUMBER = 19999;
     private WaitingFrame myw1;
     private Object lock;

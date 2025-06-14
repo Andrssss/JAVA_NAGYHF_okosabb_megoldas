@@ -12,7 +12,7 @@ import static java.lang.String.valueOf;
 /**
  * Úgy lett mogoldva a kapcsolat, hogy van egy játékos aki a szerver és egy aki nem... Ő a nem szerver.
  */
-public class Palya_kliens implements Runnable{
+public class Palya_kliens extends Jatekos implements Runnable{
     /**
      * KONSTRUKTOR
      */
@@ -196,23 +196,6 @@ public class Palya_kliens implements Runnable{
     /// ---------------------------- PRIVATE FUGGVENYEK  ---------------------------------------
     /// ----------------------------------------------------------------------------------------
     /**
-     * Amikor megkapja a "game_over 6" üzenetet, akkor abból a "6" a másik bárányai. Ez a függvény ezt a számot vágja le.
-     * @param kapott_allat "game_over 6" szerű üzenetek
-     * @return A szám, hogy másiknak mennyi báránya van az üzenet alapján.
-     */
-    private int convert_StringMessege_to_int(String kapott_allat){
-        String remainingText = kapott_allat.substring(9);
-        int number=0;
-        try {
-            number = Integer.valueOf(remainingText);
-
-        } catch (NumberFormatException e) {
-            System.err.println("Invalid integer input");
-        }
-        System.out.println("Kliens :  szerver baranyai : " + number);
-        return number;
-    }
-    /**
      * A --Field-- -től kapunk egy számot, hogy mennyi bárányunk van. Ha a játéknak vége.
      * Ez a függvény ez is küldi a másik játékosnak, az eredményt.
      * @param ennyi_baranyom_van
@@ -243,16 +226,18 @@ public class Palya_kliens implements Runnable{
 
     //  ------------------------  PRIVATE VALTOZOK JATEKHOZ  -------------------------
     // -------------------------------------------------------------------------------
-    private static Socket clientSocket;
+
+    private static PrintWriter clientWriter;
     private static int PORT_NUMBER=19999;
     private static String host="localhost";
-    private static PrintWriter clientWriter;
+
     private static final int playernumber = 2;
-    private final Object lock;
-    private final Field myField;
+    //private final Object lock;
+    //private final Field myField;
+    //private Socket clientSocket;
     private static int baranyaim = -1;
     public static boolean running = true;
-    private Thread myField_thread;
+    //private Thread myField_thread;
     private static boolean kuldott_game_overt;
 
     // -------------------------------------------------------------------------------
@@ -263,7 +248,6 @@ public class Palya_kliens implements Runnable{
      * main-ből inditható legyen a KLIENS
      */
     public static void Palya_kliens_inditas() {
-
         new WaitingFrame(2);
     }
 

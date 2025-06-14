@@ -4,7 +4,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 
-public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OLDALT
+public class Palya_szerver extends Jatekos implements Runnable , Serializable{ // Ő LESZ BAL OLDALT
 
     Palya_szerver(Socket _clientSocket, WaitingFrame w1,Object _lock,Palya _myPalya) throws IOException {
         myPalya = _myPalya;
@@ -152,28 +152,13 @@ public class Palya_szerver implements Runnable , Serializable{ // Ő LESZ BAL OL
             myField.setGame_over(true);
             running = false;
             clientSocket.close();
-            myPalya.close();
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    /**
-     * Amikor megkapja a "game_over 6" üzenetet, akkor abból a "6" a másik bárányai. Ez a függvény ezt a számot vágja le.
-     * @param kapott_allat "game_over 6" szerű üzenetek
-     * @return A szám, hogy másiknak mennyi báránya van az üzenet alapján.
-     */
-    private int convert_StringMessege_to_int(String kapott_allat){
-        String remainingText = kapott_allat.substring(9);
-        int number=0;
-        try {
-            number = Integer.valueOf(remainingText);
-        } catch (NumberFormatException e) {
-            System.err.println("Invalid integer input");
-        }
-        return number;
-    }
+
+
 
     /**
      * Azért van rá szükség, hogy biztosan elküldje a game_over üzenetet. Enélkül néha előbb állt le a szál, minthogy küldött volna.
