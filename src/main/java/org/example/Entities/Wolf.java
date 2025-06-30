@@ -1,7 +1,8 @@
-package org.example;
+package org.example.Entities;
+
 import java.awt.*;
 
-public class Farkas extends Allat implements Runnable {
+public class Wolf extends Animal implements Runnable {
     public void start() {
         thread = new Thread(this);
         thread.start();
@@ -27,13 +28,13 @@ public class Farkas extends Allat implements Runnable {
     }
 
 
-    Farkas() {
+    public Wolf() {
         hely.random();
         eletben_van = true;
         cubeColor = new Color(255, 0, 0);
     }
 
-    Farkas(int x, int y) {
+    public Wolf(int x, int y) {
         if(x>XX) x = 495;
         if(x<0) x = 0;
         if(y>YY) y = 495;

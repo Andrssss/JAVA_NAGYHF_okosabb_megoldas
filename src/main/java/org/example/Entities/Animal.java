@@ -1,7 +1,9 @@
-package org.example;
+package org.example.Entities;
+
+import org.example.Frames.Field;
+import org.example.My_Vectorr;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -9,7 +11,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Ez foglalja egy csokorba a közös tulajdonságokat
  */
-public abstract class Allat implements Runnable {
+public abstract class Animal implements Runnable {
     protected static int  merre_menjenek = -5;
 
 
@@ -25,7 +27,7 @@ public abstract class Allat implements Runnable {
      * @param _falak_monitorf Monitor, hogy szinkronban legyen --Field-- és --Field_panel-- -al
      * @return Azt küldi vissza, hogy átment-e a másik pályára
      */
-    public synchronized String randomMozgas(LinkedList<Falak> falak, Object _falak_monitorf) {
+    public synchronized String randomMozgas(LinkedList<Wall> falak, Object _falak_monitorf) {
         // Generálunk véletlenszerű irányokat
         int irany_x = merre_menjenek;
         int irany_y = ThreadLocalRandom.current().nextInt(-1, 2); // -1, 0, vagy 1 lehet az irány
@@ -39,7 +41,7 @@ public abstract class Allat implements Runnable {
         // Hogy a falak ne engedjék át --------------------------------------------------
         boolean fal_utkozes = false;
         synchronized (_falak_monitorf){
-            for(Falak f : falak){
+            for(Wall f : falak){
                 if((Math.abs(ujX - f.hely.x-5)<6) && (Math.abs(ujY - f.hely.y-5)<6)) {
                     fal_utkozes = true;
                     break;
@@ -85,7 +87,7 @@ public abstract class Allat implements Runnable {
      * @param _falak_monitor Monitor, hogy szinkronban legyen --Field-- és --Field_panel-- -al
      * @return Azt küldi vissza, hogy átment-e a másik pályára
      */
-    public synchronized String randomMozgas_Farkas(LinkedList<Falak> falak, LinkedList<Farkas> f_list, Object _farkas_monitor, Object _falak_monitor) {
+    public synchronized String randomMozgas_Farkas(LinkedList<Wall> falak, LinkedList<Wolf> f_list, Object _farkas_monitor, Object _falak_monitor) {
         // Generálunk véletlenszerű irányokat
         int irany_x = merre_menjenek;
         int irany_y = ThreadLocalRandom.current().nextInt(-1, 2); // -1, 0, vagy 1 lehet az irány
@@ -99,7 +101,7 @@ public abstract class Allat implements Runnable {
         // Hogy a falak ne engedjék át --------------------------------------------------
         boolean fal_utkozes = false;
         synchronized (_falak_monitor){
-            for(Falak f : falak){
+            for(Wall f : falak){
                 if((Math.abs(ujX - f.hely.x-5)<5) && (Math.abs(ujY - f.hely.y-5)<5)) {
                     fal_utkozes = true;
                     break;
@@ -110,7 +112,7 @@ public abstract class Allat implements Runnable {
 
         boolean farkas_utkozes = false;
         synchronized (_farkas_monitor){
-            for(Farkas f : f_list){
+            for(Wolf f : f_list){
                 if(f != this){
                     if((Math.abs(ujX - f.hely.x)<5) && (Math.abs(ujY - f.hely.y)<5)) {
                         farkas_utkozes = true;
@@ -191,13 +193,13 @@ public abstract class Allat implements Runnable {
 
 
 
-    protected Vectorr hely = new Vectorr();
-    protected Color cubeColor;
+    public My_Vectorr hely = new My_Vectorr();
+    public Color cubeColor;
     protected boolean eletben_van;
     protected int XX = Field.getPalyameret_x();
     protected int YY = Field.getPalyameret_y();
-    protected int gazdi;
-    protected boolean jobbra_atmehet;
-    protected boolean balra_atmehet;
+    public int gazdi;
+    public boolean jobbra_atmehet;
+    public boolean balra_atmehet;
 
 }

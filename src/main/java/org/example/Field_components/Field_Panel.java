@@ -1,4 +1,9 @@
-package org.example;
+package org.example.Field_components;
+
+import org.example.Entities.Sheep;
+import org.example.Entities.Wall;
+import org.example.Entities.Wolf;
+import org.example.Frames.Field;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,14 +26,14 @@ public class Field_Panel extends JPanel implements ActionListener {
      * @param _farkas_monitor Erre azért van szükség, hogy ne akadjon össze a --Field-- -el
      * @param _falak_monitor Erre azért van szükség, hogy ne akadjon össze a --Field-- -el
      */
-    Field_Panel(Field field,Object _barany_monitor,Object _farkas_monitor,Object _falak_monitor){
+    public Field_Panel(Field field, Object _barany_monitor, Object _farkas_monitor, Object _falak_monitor){
         barany_monitor = _barany_monitor;
         farkas_monitor = _farkas_monitor;
         falak_monitor = _falak_monitor;
 
         ennyi_ideje_megy_a_game = 0;
         myfield = field;
-        this.setPreferredSize(new Dimension(Field.palyameret_x,Field.palyameret_y));
+        this.setPreferredSize(new Dimension(Field.getPalyameret_x(), Field.getPalyameret_y()));
         this.setBackground(Color.green);
     }
 
@@ -36,9 +41,9 @@ public class Field_Panel extends JPanel implements ActionListener {
 
 
     protected static Color palya_szine = new Color(0, 128, 60);
-    private LinkedList<Barany> baranyok = new LinkedList<>();
-    private LinkedList<Farkas> farkasok= new LinkedList<>();
-    private LinkedList<Falak> falak = new LinkedList<>();
+    private LinkedList<Sheep> baranyok = new LinkedList<>();
+    private LinkedList<Wolf> farkasok= new LinkedList<>();
+    private LinkedList<Wall> falak = new LinkedList<>();
     private final Object farkas_monitor;
     private final Object barany_monitor;
     private final Object falak_monitor;
@@ -75,9 +80,9 @@ public class Field_Panel extends JPanel implements ActionListener {
         // --------------------- BARANYOK ------------------------------------
         //synchronized (barany_monitor) {
         synchronized (baranyok) {
-            Iterator<Barany> baranyIterator = baranyok.iterator();
+            Iterator<Sheep> baranyIterator = baranyok.iterator();
             while (baranyIterator.hasNext()) {
-                Barany b = baranyIterator.next();
+                Sheep b = baranyIterator.next();
                 g2d.setColor(b.cubeColor);
                 g2d.fillRect((int) b.hely.x, (int) b.hely.y, 5, 5);
             }
@@ -86,21 +91,21 @@ public class Field_Panel extends JPanel implements ActionListener {
         // --------------------- FARKASOK  ------------------------------------
         //synchronized (farkas_monitor) {
         synchronized (farkasok) {
-            Iterator<Farkas> farkasIterator = farkasok.iterator();
+            Iterator<Wolf> farkasIterator = farkasok.iterator();
             while (farkasIterator.hasNext()) {
-                Farkas f = farkasIterator.next();
+                Wolf f = farkasIterator.next();
                 g2d.setColor(f.cubeColor);
                 g2d.fillRect((int) f.hely.x, (int) f.hely.y, 5, 5);
             }
         }
 
         // --------------------- FALAK ------------------------------------
-        ArrayList<Falak> falak_amiket_ki_kell_torolni = new ArrayList<>();
+        ArrayList<Wall> falak_amiket_ki_kell_torolni = new ArrayList<>();
         //synchronized (falak_monitor) {
         synchronized (falak) {
-            Iterator<Falak> iterator = falak.iterator();
+            Iterator<Wall> iterator = falak.iterator();
             while (iterator.hasNext()) {
-                Falak f = iterator.next();
+                Wall f = iterator.next();
                 if (f.ennyi_maodperce_el >= falak_meghalasi_ideje) {
                     falak_amiket_ki_kell_torolni.add(f);
                 }
@@ -109,7 +114,7 @@ public class Field_Panel extends JPanel implements ActionListener {
                 f.ennyi_maodperce_el++;
             }
 
-            for (Falak f : falak_amiket_ki_kell_torolni) {
+            for (Wall f : falak_amiket_ki_kell_torolni) {
                 falak.remove(f);
             }
         }

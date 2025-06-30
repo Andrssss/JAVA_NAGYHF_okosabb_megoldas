@@ -1,11 +1,11 @@
-package org.example;
+package org.example.Entities;
 
 import java.awt.*;
 
 /**
  * Falak, olyanok, mint az állatok, csak nem mozognak.
  */
-public class Falak extends Allat {
+public class Wall extends Animal {
     public int ennyi_maodperce_el;
 
 
@@ -14,7 +14,7 @@ public class Falak extends Allat {
      * @param x helye
      * @param y helye
      */
-    public Falak(int x, int y) { // ide kell létrehozni
+    public Wall(int x, int y) { // ide kell létrehozni
         ennyi_maodperce_el=0;
         eletben_van = true;
         hely.x = (x-10) ;
@@ -25,5 +25,5 @@ public class Falak extends Allat {
     /**
      * Szép dolog üres konstruktort is létrehozni szerintem.
      */
-    public Falak() {}
+    public Wall() {}
 }

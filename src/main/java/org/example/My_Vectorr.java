@@ -1,31 +1,33 @@
 package org.example;
 
+import org.example.Frames.Field;
+
 import java.util.concurrent.ThreadLocalRandom;
 import static java.lang.Math.floor;
-import static java.lang.Math.sqrt;
 
 
 /**
  * Csokorba összeszedve az összes vector művelet, amire szükség lett volna
  */
-public class Vectorr {
-    double x, y;
+public class My_Vectorr {
+    public double x;
+    public double y;
 
     /**
      * konstruktor
      * @param xx palya meret x
      * @param yy palya meret y
      */
-    Vectorr(double xx, double yy){
+    My_Vectorr(double xx, double yy){
         this.x = xx;
         this.y = yy;
     }
-    Vectorr(){}
+    public My_Vectorr(){}
 
     /**
      * Ha allatot szeretnenk letrehozni, random helyre, akkor ez a right way
      */
-    void random()
+    public void random()
     {
         float x_randomNumber = ThreadLocalRandom.current().nextInt(Field.getPalyameret_x());
         float y_randomNumber = ThreadLocalRandom.current().nextInt(Field.getPalyameret_y());

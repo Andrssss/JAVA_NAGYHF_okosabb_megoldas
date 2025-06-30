@@ -1,8 +1,9 @@
-package org.example;
+package org.example.Entities;
+
 import java.awt.*;
 
 
-public class Barany extends Allat implements Runnable{
+public class Sheep extends Animal implements Runnable{
     /**
      * Elindít egy külön szálat az állatnak. Enélkül a fő szál ami indít, megkéne várnia, hogy lefut ez a szál
      */
@@ -41,7 +42,7 @@ public class Barany extends Allat implements Runnable{
     /**
      * Alap értékek beállítása, random helyre spannol.
      */
-    Barany() {
+    public Sheep() {
         eletben_van = true;
         hely.random();
         cubeColor = new Color(255, 255, 255);
@@ -52,7 +53,7 @@ public class Barany extends Allat implements Runnable{
      * @param x x helyen
      * @param y y helyen
      */
-    Barany(int x, int y) {
+    public Sheep(int x, int y) {
         if(x>XX) x = 495;
         if(x<0) x = 0;
         if(y>YY) y = 495;

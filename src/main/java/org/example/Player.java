@@ -1,9 +1,11 @@
 package org.example;
 
 
+import org.example.Frames.Field;
+
 import java.net.Socket;
 
-public abstract class   Jatekos {
+public abstract class Player {
     protected Object lock;
     protected Field myField;
     protected Thread myField_thread;

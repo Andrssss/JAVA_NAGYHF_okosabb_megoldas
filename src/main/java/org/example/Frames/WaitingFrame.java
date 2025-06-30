@@ -1,4 +1,7 @@
-package org.example;
+package org.example.Frames;
+
+import org.example.Field_components.Field;
+import org.example.Field_components.Field_client;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -18,7 +21,7 @@ public class WaitingFrame extends JFrame implements ActionListener {
     private final JFrame frame = new JFrame();
     private final int playernumber;
     private static String messege = " ";
-    private Palya MyPalya = null;
+    private Field MyPalya = null;
 
 
     /**
@@ -28,8 +31,8 @@ public class WaitingFrame extends JFrame implements ActionListener {
     public WaitingFrame(int _playernumber){
         playernumber = _playernumber;
 
-        if(playernumber==1)label1 = new Label("localhost : "+Palya.getPORT_NUMBER() );
-        if(playernumber==2)label1 = new Label( Palya_kliens.getHost()+" : "+Palya_kliens.getPORT_NUMBER() );
+        if(playernumber==1)label1 = new Label("localhost : "+ Field.getPORT_NUMBER() );
+        if(playernumber==2)label1 = new Label( Field_client.getHost()+" : "+ Field_client.getPORT_NUMBER() );
         label2 = new Label( "ready to connect");
         label1.setBounds(100,60,150,15);
         label2.setBounds(100,190,150,15);
@@ -83,7 +86,7 @@ public class WaitingFrame extends JFrame implements ActionListener {
     private void KLIENS_PROBAL_CSATLAKOZNI() {
         //Object _lock= new Object();
         //Palya_kliens p1 = new Palya_kliens("localhost",_lock);
-        Palya_kliens p1 = new Palya_kliens();
+        Field_client p1 = new Field_client();
         Thread t1 = new Thread(p1);
         if(messege.equals("success")){
             t1.start();
@@ -112,7 +115,7 @@ public class WaitingFrame extends JFrame implements ActionListener {
      */
     private void SZERVER_INDUL() throws InterruptedException {
         Object _lock2= new Object();
-        MyPalya = new Palya(this,_lock2);
+        MyPalya = new Field(this,_lock2);
         new Thread(MyPalya).start();
 
         // WAITING -------------------------
@@ -153,7 +156,7 @@ public class WaitingFrame extends JFrame implements ActionListener {
             if(MyPalya != null) {
                 MyPalya.close();
             }
-            Palya.running = false;
+            Field.running = false;
             frame.dispose();
         }
     }

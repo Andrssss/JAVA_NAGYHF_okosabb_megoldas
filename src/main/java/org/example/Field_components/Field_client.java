@@ -1,4 +1,9 @@
-package org.example;
+package org.example.Field_components;
+import org.example.Frames.Ending_Frame;
+import org.example.Frames.Field;
+import org.example.Frames.WaitingFrame;
+import org.example.Player;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,11 +17,11 @@ import static java.lang.String.valueOf;
 /**
  * Úgy lett mogoldva a kapcsolat, hogy van egy játékos aki a szerver és egy aki nem... Ő a nem szerver.
  */
-public class Palya_kliens extends Jatekos implements Runnable{
+public class Field_client extends Player implements Runnable{
     /**
      * KONSTRUKTOR
      */
-    protected Palya_kliens() {
+    public Field_client() {
         lock = new Object();
         myField = new Field(2,lock);
         host = "localhost";
@@ -164,23 +169,24 @@ public class Palya_kliens extends Jatekos implements Runnable{
      * --WaintigFrame-- -re jazoláshoz kell ez a függvény
      * @return host
      */
-    protected static String getHost() {return host;}
+    public static String getHost() {return host;}
 
     /**
      * --ChangePortFrame-- -állítja be, hogy melyik IP-re csatlakozzunk rá
      * @param host host
      */
-    protected static void setHost(String host) {Palya_kliens.host = host;  }
+    public static void setHost(String host) {
+        Field_client.host = host;  }
     /**
      * --WaintigFrame-- -re jazoláshoz kell ez a függvény
      * @return PORTNUMBER
      */
-    protected static String getPORT_NUMBER() { return valueOf(PORT_NUMBER);  }
+    public static String getPORT_NUMBER() { return valueOf(PORT_NUMBER);  }
     /**
      * --ChangePortFrame-- -állítja be, hogy melyik IP-re csatlakozzunk rá
      * @return PORTNUMBER
      */
-    protected static void setPORT_NUMBER(int newport) { PORT_NUMBER = newport;  }
+    public static void setPORT_NUMBER(int newport) { PORT_NUMBER = newport;  }
 
     /**
      * run(), hívja meg, ha kap egy "game-over"-t
@@ -200,7 +206,7 @@ public class Palya_kliens extends Jatekos implements Runnable{
      * Ez a függvény ez is küldi a másik játékosnak, az eredményt.
      * @param ennyi_baranyom_van
      */
-    protected static void ennyi_baranyod_van(int ennyi_baranyom_van){
+    public static void ennyi_baranyod_van(int ennyi_baranyom_van){
         kuldott_game_overt = true;
         baranyaim = ennyi_baranyom_van;
         try {
@@ -215,7 +221,7 @@ public class Palya_kliens extends Jatekos implements Runnable{
      * @param line Az elküldendő üzenet
      * @throws IOException Ha idő közben socket -el valami történt.
      */
-    protected static void sendLine(String line) throws IOException {
+    public static void sendLine(String line) throws IOException {
         //System.out.println("Kliens send : "+ line + " to : " +clientSocket.getInetAddress()+" : "+ PORT_NUMBER);
         clientWriter.print(line + "\r\n");
         clientWriter.flush();

@@ -1,18 +1,22 @@
-package org.example;
+package org.example.Field_components;
+import org.example.Frames.Ending_Frame;
+import org.example.Frames.WaitingFrame;
+import org.example.Player;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 
 
-public class Palya_szerver extends Jatekos implements Runnable , Serializable{ // Ő LESZ BAL OLDALT
+public class Field_server extends Player implements Runnable , Serializable{ // Ő LESZ BAL OLDALT
 
-    Palya_szerver(Socket _clientSocket, WaitingFrame w1,Object _lock,Palya _myPalya) throws IOException {
+    Field_server(Socket _clientSocket, WaitingFrame w1, Object _lock, Field _myPalya) throws IOException {
         myPalya = _myPalya;
         lock = _lock;
         Myw1 =w1;
         kuldott_game_overt = false;
 
-        myField = new Field(1,lock);
+        myField = new org.example.Frames.Field(1,lock);
 
         clientSocket = _clientSocket;
         clientWriter = new PrintWriter(clientSocket.getOutputStream()); //
@@ -171,7 +175,7 @@ public class Palya_szerver extends Jatekos implements Runnable , Serializable{ /
      * Ez a függvény ez is küldi a másik játékosnak, az eredményt.
      * @param ennyi_baranyom_van
      */
-    protected static void ennyi_baranyod_van(int ennyi_baranyom_van){
+    public static void ennyi_baranyod_van(int ennyi_baranyom_van){
         setKuldott_game_overt();
         baranyaim = ennyi_baranyom_van;
         try {
@@ -187,7 +191,7 @@ public class Palya_szerver extends Jatekos implements Runnable , Serializable{ /
      * @param line Az elküldendő üzenet
      * @throws IOException Ha idő közben socket -el valami történt.
      */
-    protected static void sendLine(String line) throws IOException {
+    public static void sendLine(String line) throws IOException {
         // NULLPOINTER ERROR
         if(clientSocket!=null){
             System.out.println("Szerver send : "+ line + " to : " +clientSocket.getInetAddress()+":"+ PORT_NUMBER+" - "+ clientSocket.getPort());
@@ -213,13 +217,13 @@ public class Palya_szerver extends Jatekos implements Runnable , Serializable{ /
     private static final int PORT_NUMBER= 19999;
     protected static PrintWriter clientWriter;
     private static boolean kuldott_game_overt;
-    private final Field myField;
+    private final org.example.Frames.Field myField;
     private final Object lock;
     private static WaitingFrame Myw1;
     private static int baranyaim = -1;
     private boolean running = true;
     private Thread myField_thread;
-    private final Palya myPalya;
+    private final Field myPalya;
     // -------------------------------------------------------------------------------
     // -------------------------------------------------------------------------------
 

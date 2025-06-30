@@ -1,4 +1,7 @@
-package org.example;
+package org.example.Frames;
+
+import org.example.Field_components.Field;
+import org.example.Field_components.Field_client;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +20,7 @@ public class Ending_Frame extends JFrame implements ActionListener {
      * @param masik_baranyai Ő bárányai, lányok nem játszanak ezért His
      * @param _playernumber A cím miatt fontos csak. nem vizsgálunk vele semmit
      */
-    Ending_Frame(int en_baranyaim, int masik_baranyai ,int _playernumber){
+    public Ending_Frame(int en_baranyaim, int masik_baranyai, int _playernumber){
 
         if(en_baranyaim == -1 && masik_baranyai == -1 ){
             label1 = new Label("Kapcsolat megszakadt");
@@ -60,11 +63,11 @@ public class Ending_Frame extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if(e.getSource()==button2){
             if(playernumber == 1) {
-                Palya.running = false;
+                Field.running = false;
                 System.out.println("Ending_Frame : Palya running false");
             }
             if(playernumber == 2) {
-                Palya_kliens.running = false;
+                Field_client.running = false;
                 System.out.println("Ending_Frame : Palya_kliens running false");
             }
             frame.dispose();

@@ -1,4 +1,6 @@
-package org.example;
+package org.example.Field_components;
+
+import org.example.Frames.WaitingFrame;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -12,7 +14,7 @@ import static java.lang.String.valueOf;
  * Lényegében a --Palya_szerver-- segítő apja.
  * Van timeout.
  */
-public class Palya implements Runnable {
+public class Field implements Runnable {
 
     /**
      * KONSTRUKTOR
@@ -20,7 +22,7 @@ public class Palya implements Runnable {
      *           ezt odaadjuk a --Palya_szerver-- -nek.
      * @param _lock Ez fogja a --Palya_szerver-- és --Field-- közti nézeteltéréseket rendezni
      */
-    public Palya(WaitingFrame w1, Object _lock) {
+    public Field(WaitingFrame w1, Object _lock) {
         System.out.println("Palya : letrehozas");
         timeout = 100000; // 100 másodperc
         running = true;
@@ -52,7 +54,7 @@ public class Palya implements Runnable {
                         if(szamolo==0){
                             System.out.println("Palya : kliens elfogadas");
                             clientSocket = serverSocket.accept(); // itt elfogadja a kérést és nyit egy socketet
-                            MyPalya_szerver = new Palya_szerver(clientSocket, myw1, lock, this);
+                            MyPalya_szerver = new Field_server(clientSocket, myw1, lock, this);
 
                             MyPalya_szerver.run();
                             // Megvárjuk, hogy a MyPalya_szerver befejezze a futását
@@ -136,5 +138,5 @@ public class Palya implements Runnable {
     private Object lock;
     private static int timeout;
     public static boolean running; // todo getter // setter
-    private Palya_szerver MyPalya_szerver = null;
+    private Field_server MyPalya_szerver = null;
 }

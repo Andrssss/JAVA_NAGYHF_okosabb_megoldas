@@ -1,5 +1,9 @@
 package org.example;
 
+import org.example.Entities.Animal;
+import org.example.Field_components.Field_client;
+import org.example.Field_components.Field_server;
+
 public class Main {
     public static void main(String[] args) {
         // Jaték ideje -- Field_Panel -- tetején változtatható
@@ -23,12 +27,12 @@ public class Main {
 
 
         // jobbra és balra lehet és ennyi :(
-        Allat.jobbra();
+        Animal.jobbra();
 
 
         // külön külön is enindíthatók, megszakítás tesztelésre
-        Palya_szerver.Palya_szerver_inditas();
-        Palya_kliens.Palya_kliens_inditas();
+        Field_server.Palya_szerver_inditas();
+        Field_client.Palya_kliens_inditas();
         //Palya_kliens.Palya_kliens_inditas();
 
 

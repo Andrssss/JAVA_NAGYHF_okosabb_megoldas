@@ -1,4 +1,7 @@
-package org.example;
+package org.example.Frames;
+
+import org.example.Field_components.Field;
+import org.example.Field_components.Field_client;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,14 +34,14 @@ public class ChangePortFrame extends JFrame implements ActionListener {
         if(playernumber != 1){
             button1.addActionListener(this);
             textField1.setPreferredSize(new Dimension(250,50));
-            textField1.setText(Palya_kliens.getHost());
+            textField1.setText(Field_client.getHost());
         }
 
 
         textField2.setPreferredSize(new Dimension(250,50));
 
-        if(playernumber == 1)       {   textField2.setText(Palya.getPORT_NUMBER());         }
-        else if(playernumber != 2)  {  textField2.setText(Palya_kliens.getPORT_NUMBER());   }
+        if(playernumber == 1)       {   textField2.setText(Field.getPORT_NUMBER());         }
+        else if(playernumber != 2)  {  textField2.setText(Field_client.getPORT_NUMBER());   }
 
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -70,7 +73,7 @@ public class ChangePortFrame extends JFrame implements ActionListener {
         if(e.getSource()==button1) {
             if(playernumber == 1) System.out.println("Player 1 nem valtothat ip itt.");
             else{
-                Palya_kliens.setHost(textField1.getText());
+                Field_client.setHost(textField1.getText());
             }
         }
 
@@ -80,8 +83,8 @@ public class ChangePortFrame extends JFrame implements ActionListener {
             if(isInteger(input_data).equals(" "))  {  textField2.setText("Ez nem valid port"); }
             else{
                 int number = Integer.parseInt(input_data);
-                if(playernumber == 1)       Palya.setPORT_NUMBER(number);
-                else                        Palya_kliens.setPORT_NUMBER(number);
+                if(playernumber == 1)       Field.setPORT_NUMBER(number);
+                else                        Field_client.setPORT_NUMBER(number);
             }
         }
 

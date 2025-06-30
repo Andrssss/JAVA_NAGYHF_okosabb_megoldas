@@ -1,4 +1,11 @@
-package org.example;
+package org.example.Frames;
+import org.example.Entities.Sheep;
+import org.example.Entities.Wall;
+import org.example.Entities.Wolf;
+import org.example.Field_components.Field_Panel;
+import org.example.Field_components.Field_client;
+import org.example.Field_components.Field_server;
+
 import javax.swing.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -23,7 +30,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
      *              a game-over üzenetet, ekkor vár ennek a szálnak a válaszára, hogy neki mennyi báránya van. Ezután hívja csak
      *              meg az --Ending-frame-- -et. Enélkül sokszor a Palya-kliens/szerver általában gyorsabban fut le, mint ez.
      */
-    Field(int _playernumber,Object _lock) {
+    public Field(int _playernumber, Object _lock) {
         lock = _lock;
         playernumber = _playernumber;
         game_over = false;
@@ -97,7 +104,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                 int farkaso_szama = allakot_szama;
                 int baranyok_szama = allakot_szama;
                 for (int i = 0; i < baranyok_szama; i++) {
-                    Barany barany = new Barany();
+                    Sheep barany = new Sheep();
                     barany.setGazdi(playernumber);
                     synchronized (b_list) {b_list.add(barany);} // Ez sok fejfájást okozott
                     //synchronized (barany_monitor) {b_list.add(barany);} // Ez sok fejfájást okozott
@@ -105,7 +112,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                     barany.start();
                 }
                 for (int i = 0; i < farkaso_szama; i++) {
-                    Farkas f = new Farkas();
+                    Wolf f = new Wolf();
                     f.setGazdi(playernumber);
                     synchronized (f_list){f_list.add(f);}
                     //synchronized (farkas_monitor){f_list.add(f);}
@@ -119,16 +126,16 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
      * Nem feltétlenűl optimális, de biztonságos, ami prioritás volt.
      */
     public void OsztMeghaltal_e() {
-        ArrayList<Barany> remove_b_list = new ArrayList<>();
+        ArrayList<Sheep> remove_b_list = new ArrayList<>();
 
         synchronized (f_list) {
         //synchronized (farkas_monitor) {
-            for (Farkas f : f_list) {
+            for (Wolf f : f_list) {
                 //synchronized (barany_monitor) {
                 synchronized (b_list) {
-                    Iterator<Barany> baranyIterator = b_list.iterator();
+                    Iterator<Sheep> baranyIterator = b_list.iterator();
                     while (baranyIterator.hasNext()) {
-                        Barany b = baranyIterator.next();
+                        Sheep b = baranyIterator.next();
                         if ((Math.abs(f.hely.x - b.hely.x - 5) < 6) && (Math.abs(f.hely.y - b.hely.y - 5) < 6)) {
                             b.stopRunning();
                             remove_b_list.add(b);
@@ -140,7 +147,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
 
         synchronized (b_list) {
         //synchronized (barany_monitor) {
-            for (Barany b : remove_b_list) {
+            for (Sheep b : remove_b_list) {
                 b_list.remove(b);
             }
         }
@@ -153,12 +160,12 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
      */
     public void AllatokMozog(){
         if(!game_over) {
-            ArrayList<Barany> remove_b_list = new ArrayList<>();
-            ArrayList<Farkas> remove_f_list = new ArrayList<>();
+            ArrayList<Sheep> remove_b_list = new ArrayList<>();
+            ArrayList<Wolf> remove_f_list = new ArrayList<>();
 
             synchronized (b_list){
             //synchronized (barany_monitor){
-                for (Barany b : b_list) {
+                for (Sheep b : b_list) {
                     String eredmeny = b.randomMozgas(fal_list,falak_monitor);
 
                     if (!eredmeny.equals("marad")) {
@@ -167,7 +174,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                                 int y_hely = (int) b.hely.y;
                                 //b.stopRunning();
                                 try {
-                                    Palya_szerver.sendLine("Barany "+ 0 +" "+ y_hely);
+                                    Field_server.sendLine("Barany "+ 0 +" "+ y_hely);
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -178,7 +185,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                                 int y_hely = (int) b.hely.y;
                                 //b.stopRunning();
                                 try {
-                                    Palya_kliens.sendLine("Barany "+ (palyameret_y-5) +" "+ y_hely);
+                                    Field_client.sendLine("Barany "+ (palyameret_y-5) +" "+ y_hely);
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -191,7 +198,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
 
             synchronized (f_list) {
             //synchronized (farkas_monitor) {
-                for (Farkas b : f_list) {
+                for (Wolf b : f_list) {
                     String eredmeny = b.randomMozgas_Farkas(fal_list,f_list,farkas_monitor,falak_monitor);
 
                     if (!eredmeny.equals("marad")) {
@@ -200,7 +207,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                                 int y_hely = (int) b.hely.y;
                                 //b.stopRunning();
                                 try {
-                                    Palya_szerver.sendLine("Farkas " + 0 + " " + y_hely);
+                                    Field_server.sendLine("Farkas " + 0 + " " + y_hely);
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -211,7 +218,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
                                 int y_hely = (int) b.hely.y;
                                 //b.stopRunning();
                                 try {
-                                    Palya_kliens.sendLine("Farkas " + (palyameret_y - 5) + " " + y_hely);
+                                    Field_client.sendLine("Farkas " + (palyameret_y - 5) + " " + y_hely);
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -224,14 +231,14 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
 
             synchronized (b_list) { // sok fejfájás...
             //synchronized (barany_monitor) { // sok fejfájás...
-                for (Barany b : remove_b_list) {
+                for (Sheep b : remove_b_list) {
                     b.stopRunning();
                     b_list.remove(b);
                 }
             }
             synchronized (f_list) {
             //synchronized (farkas_monitor) {
-                for (Farkas b : remove_f_list) {
+                for (Wolf b : remove_f_list) {
                     b.stopRunning();
                     f_list.remove(b);
                 }
@@ -247,7 +254,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
      */
     public void addBarany(int x,int y){
         //System.out.println("Barany - y : " + " Player" + playernumber);
-        Barany b = new Barany(x,y);
+        Sheep b = new Sheep(x,y);
         b.setGazdi(playernumber);
         //synchronized (barany_monitor) {  b_list.add(b);  }
         synchronized (b_list) {  b_list.add(b);  }
@@ -265,7 +272,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
      */
     public void addFarkas(int x,int y){
         //System.out.println("Farkas - y : " + " Player" + playernumber);
-        Farkas f = new Farkas(x, y);
+        Wolf f = new Wolf(x, y);
         f.setGazdi(playernumber);
         synchronized (f_list){  f_list.add(f);  }
         //synchronized (farkas_monitor){  f_list.add(f);  }
@@ -285,12 +292,12 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
             synchronized (lock){
                 System.out.println("Field : belepett a végére");
                 //synchronized (farkas_monitor){ for(Farkas b : f_list){ b.stopRunning(); }}
-                synchronized (f_list){ for(Farkas b : f_list){ b.stopRunning(); }}
+                synchronized (f_list){ for(Wolf b : f_list){ b.stopRunning(); }}
                 //synchronized (barany_monitor){for(Barany b : b_list){  ennyi_baranyom_van++;  b.stopRunning(); }}
-                synchronized (b_list){for(Barany b : b_list){  ennyi_baranyom_van++;  b.stopRunning(); }}
+                synchronized (b_list){for(Sheep b : b_list){  ennyi_baranyom_van++;  b.stopRunning(); }}
 
-                if(playernumber == 1) Palya_szerver.ennyi_baranyod_van(ennyi_baranyom_van);
-                if(playernumber == 2) Palya_kliens.ennyi_baranyod_van(ennyi_baranyom_van);
+                if(playernumber == 1) Field_server.ennyi_baranyod_van(ennyi_baranyom_van);
+                if(playernumber == 2) Field_client.ennyi_baranyod_van(ennyi_baranyom_van);
                 lock.notifyAll();
                 //System.out.println("Player" +playernumber +" - "+ ennyi_baranyom_van);
                 frame.dispose();
@@ -311,17 +318,17 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
      * A --Field-panel-- -nak ez a függvény küldi el a barikat. Ő ott lemásolja és rajzolja őket.
      * @return Küldi a teljese listát
      */
-    public LinkedList<Barany> getBaranyok() {return b_list; }
+    public LinkedList<Sheep> getBaranyok() {return b_list; }
     /**
      * A --Field-panel-- -nak ez a függvény küldi el a farkasokat. Ő ott lemásolja és rajzolja őket.
      * @return Küldi a teljese listát
      */
-    public LinkedList<Farkas> getFarkasok(){ return f_list;}
+    public LinkedList<Wolf> getFarkasok(){ return f_list;}
     /**
      * A --Field-panel-- -nak ez a függvény küldi el a falakat. Ő ott lemásolja és rajzolja őket.
      * @return Küldi a teljese listát
      */
-    public LinkedList<Falak> getFalak(){ return fal_list; }
+    public LinkedList<Wall> getFalak(){ return fal_list; }
     /**
      * A palya x dimenziója
      * @return dimenzió
@@ -367,7 +374,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
             int y = e.getY();
 
             if(fal_list.size()<max_hanydb_fal){
-                Falak f1 = new Falak(x,y);
+                Wall f1 = new Wall(x,y);
                 synchronized (falak_monitor) { fal_list.add(f1); }
             }
         }
@@ -396,9 +403,9 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
 
     //  ------------------------  PRIVATE VALTOZOK JATEKHOZ  -------------------------
     // -------------------------------------------------------------------------------
-    private LinkedList<Barany> b_list =  new LinkedList<>(); // mondanom sem kell de ez fényévekkel gyorsabb, mint ArrayList... elképesztő
-    private LinkedList<Farkas> f_list =  new LinkedList<>();
-    private LinkedList<Falak> fal_list =  new LinkedList<>();
+    private LinkedList<Sheep> b_list =  new LinkedList<>(); // mondanom sem kell de ez fényévekkel gyorsabb, mint ArrayList... elképesztő
+    private LinkedList<Wolf> f_list =  new LinkedList<>();
+    private LinkedList<Wall> fal_list =  new LinkedList<>();
     private Object farkas_monitor = new Object(); // ezek a monitorok a Field és Field_monitor közti
     private Object barany_monitor = new Object(); // harcot vívja meg... Meg néha amikor mozgást végzi
     private Object falak_monitor = new Object(); // a Field, akkor a ciklus közepén jön egy új bárány
@@ -410,7 +417,7 @@ public final class Field  extends JFrame  implements MouseListener, Runnable {
     private JFrame frame = new JFrame();
     private int playernumber; // 1 - SERVER, 2 - KLIENS
     private Field_Panel panel;
-    protected boolean game_over; // def :  false
+    public boolean game_over; // def :  false
     private int ennyi_baranyom_van=0; // ide számolja a végén, hogy mennyi van és küldi el a másik játékosnak
 
     // -------------------------------------------------------------------------------
