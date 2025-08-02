@@ -1,9 +1,8 @@
-This program is the big project of JAVA course. 
-I need to do a little game, what is a 2 player thing. And of course u can play it from anywhere.
+This program is the main project for my Java course.
+I'm building a simple two-player game that can be played from anywhere.
 
-The first player is the server, and the seccond is connecting. 
-
-Its a fun experience, but oh god, why i have 6 more course.
+The first player acts as the server, and the second one connects as a client.
+It's was a fun experience overall.
 
 ![Image](https://github.com/user-attachments/assets/b094facd-95e3-4295-9880-745824bf174f)
 
